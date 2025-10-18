@@ -1,0 +1,66 @@
+<div class="p-6 max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold mb-1">
+    {{ isEdit ? 'Editar Categoría' : 'Nueva Categoría' }}
+  </h1>
+  <p class="text-slate-500 mb-6">
+    Completa la información de la categoría para tu inventario.
+  </p>
+
+  <form (ngSubmit)="saveCategory()" class="space-y-5">
+    <!-- Descripción -->
+    <div>
+      <label for="descripcion" class="block text-sm font-medium mb-1">Descripción *</label>
+      <input
+        id="descripcion"
+        [(ngModel)]="category.descripcion"
+        name="descripcion"
+        required
+        class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+        placeholder="Ejemplo: Calzado, Camisas, Accesorios..."
+      />
+    </div>
+
+    <!-- Estado (Switch) -->
+    <div class="flex items-center justify-between">
+      <span class="text-sm font-medium">Estado</span>
+      <label class="inline-flex items-center cursor-pointer">
+        <input
+          type="checkbox"
+          [(ngModel)]="category.estado"
+          name="estado"
+          class="sr-only peer"
+        />
+        <div
+          class="w-11 h-6 bg-slate-200 rounded-full peer-focus:outline-none
+                 peer-checked:bg-emerald-500 relative transition-colors"
+        >
+          <div
+            class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform
+                   peer-checked:translate-x-5"
+          ></div>
+        </div>
+        <span class="ml-3 text-sm text-slate-700">
+          {{ category.estado ? 'Activo' : 'Inactivo' }}
+        </span>
+      </label>
+    </div>
+
+    <!-- Botones -->
+    <div class="flex justify-end gap-2 pt-4">
+      <button
+        type="submit"
+        class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700 transition-colors"
+      >
+        {{ isEdit ? 'Actualizar' : 'Guardar' }}
+      </button>
+
+      <button
+        type="button"
+        (click)="cancel()"
+        class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300 transition-colors"
+      >
+        Cancelar
+      </button>
+    </div>
+  </form>
+</div>

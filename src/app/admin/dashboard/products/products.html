@@ -1,60 +1,253 @@
-<div class="p-6">
-  <div class="flex justify-between items-center mb-6">
+<section>
+  <!-- Header -->
+  <div class="flex items-center justify-between mb-6">
     <div>
-      <h1 class="text-2xl font-bold">Productos</h1>
-      <p class="text-muted-foreground text-lg">Gestiona tu inventario de productos</p>
+      <h1 class="text-3xl font-extrabold text-slate-900">Productos</h1>
+      <p class="text-slate-500">Gestiona tu inventario de productos</p>
     </div>
-    <button class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700" (click)="goToNewProduct()">
+    <button
+      type="button"
+      (click)="openNew()"
+      class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+    >
       Nuevo Producto
     </button>
   </div>
 
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-    <div *ngIf="products.length === 0" class="col-span-full text-center p-12 border rounded">
-      <h3 class="text-xl font-semibold mb-2">No hay productos</h3>
-      <p class="text-muted-foreground mb-4">Comienza agregando tu primer producto</p>
-      <button class="px-3 py-1 bg-blue-600 text-white rounded" (click)="goToNewProduct()">Agregar Producto</button>
-    </div>
+  <!-- Lista / Empty state -->
+  <div class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+    <ng-container *ngIf="products.length; else empty">
+      <table class="min-w-full text-sm">
+        <thead class="bg-slate-50 text-slate-600">
+          <tr>
+            <th class="text-left px-4 py-3">ID</th>
+            <th class="text-left px-4 py-3">Nombre</th>
+            <th class="text-left px-4 py-3">Categoría</th>
+            <th class="text-left px-4 py-3">Precio</th>
+            <th class="text-left px-4 py-3">Stock</th>
+            <th class="text-right px-4 py-3">Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let p of products" class="border-t hover:bg-slate-50 transition">
+            <td class="px-4 py-3">{{ p.id }}</td>
+            <td class="px-4 py-3">{{ p.nombre }}</td>
+            <td class="px-4 py-3">{{ p.categoriaNombre }}</td>
+            <td class="px-4 py-3">S/ {{ p.precio }}</td>
+            <td class="px-4 py-3">{{ p.stock }}</td>
+            <td class="px-4 py-3 text-right space-x-2">
+              <button (click)="openEdit(p)" class="px-3 py-1.5 rounded-lg border hover:bg-slate-100">
+                Editar
+              </button>
+              <button (click)="delete(p)" class="px-3 py-1.5 rounded-lg border hover:bg-slate-100">
+                Eliminar
+              </button>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </ng-container>
 
-    <div *ngFor="let product of products" class="border rounded overflow-hidden">
-      <div class="aspect-square bg-gray-100 relative">
-        <img
-          [src]="product.imagen || '/assets/placeholder.svg'"
-          [alt]="product.nombre"
-          class="w-full h-full object-cover"
-        />
+    <ng-template #empty>
+      <div class="p-12 text-center">
+        <div class="text-slate-600 font-semibold mb-1">No hay productos</div>
+        <div class="text-slate-500 mb-4">Comienza agregando tu primer producto</div>
+        <button
+          type="button"
+          (click)="openNew()"
+          class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700"
+        >
+          Agregar Producto
+        </button>
       </div>
-      <div class="p-4">
-        <div class="flex justify-between items-start mb-2">
-          <h3 class="text-lg font-bold">{{ product.nombre }}</h3>
-          <button class="text-red-600" (click)="deleteProduct(product.id)">Eliminar</button>
-        </div>
+    </ng-template>
+  </div>
 
-        <p class="text-sm text-gray-500 mb-2">{{ product.descripcion }}</p>
+  <!-- ===== Modal Crear/Editar Producto ===== -->
+  <div *ngIf="showModal" class="fixed inset-0 z-50 flex items-center justify-center">
+    <!-- Backdrop -->
+    <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
 
-        <div class="flex gap-2 mb-2">
-          <span class="px-2 py-1 bg-gray-200 rounded text-xs">{{ categoriesMap[product.categoriaNombre] || 'Sin categoría' }}</span>
-          <span [ngClass]="{'bg-red-200': product.stock < 10, 'bg-gray-200': product.stock >= 10}" 
-                class="px-2 py-1 rounded text-xs">
-            Stock: {{ product.stock }}
-          </span>
-        </div>
+    <!-- Card -->
+    <div class="relative bg-white w-full max-w-2xl mx-4 rounded-2xl shadow-xl border border-slate-200">
+      <div class="px-6 py-4 border-b">
+        <h2 class="text-lg font-bold">
+          {{ isEdit ? 'Editar Producto' : 'Nuevo Producto' }}
+        </h2>
+      </div>
 
-        <div class="flex justify-between items-center mb-2">
-          <p class="text-xl font-bold">${{ product.precio }}</p>
-          <div class="flex gap-1">
-            <div *ngFor="let color of product.color"
-                 class="w-5 h-5 rounded-full border"
-                 [style.backgroundColor]="color"
-                 [title]="color">
+      <!-- ÚNICO form -->
+      <form #f="ngForm" (ngSubmit)="save()" class="px-6 py-5 space-y-4">
+        <!-- GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <!-- Nombre -->
+          <div>
+            <label class="block text-sm font-medium mb-1">Nombre *</label>
+            <input
+              [(ngModel)]="form.nombre"
+              name="nombre"
+              required
+              #nombre="ngModel"
+              class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            />
+            <p *ngIf="nombre.invalid && nombre.touched" class="text-xs text-rose-600 mt-1">
+              El nombre es obligatorio.
+            </p>
+          </div>
+
+          <!-- Precio -->
+          <div>
+            <label class="block text-sm font-medium mb-1">Precio *</label>
+            <input
+              type="number"
+              min="0.01"
+              step="0.01"
+              [(ngModel)]="form.precio"
+              name="precio"
+              required
+              #precio="ngModel"
+              class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            />
+            <p *ngIf="(precio.invalid && precio.touched) || (form.precio<=0 && precio.touched)"
+               class="text-xs text-rose-600 mt-1">
+              Ingrese un precio válido.
+            </p>
+          </div>
+
+          <!-- Stock -->
+          <div>
+            <label class="block text-sm font-medium mb-1">Stock</label>
+            <input
+              type="number"
+              min="0"
+              [(ngModel)]="form.stock"
+              name="stock"
+              #stock="ngModel"
+              class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            />
+          </div>
+
+          <!-- Categoría -->
+          <div>
+            <label class="block text-sm font-medium mb-1">Categoría *</label>
+            <select
+              [(ngModel)]="form.categoriaId"
+              name="categoriaId"
+              required
+              #categoriaId="ngModel"
+              class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            >
+              <option [ngValue]="0">Selecciona una categoría</option>
+              <option *ngFor="let c of categories" [ngValue]="c.id">{{ c.descripcion }}</option>
+            </select>
+            <p *ngIf="categoriaId.invalid && categoriaId.touched" class="text-xs text-rose-600 mt-1">
+              Selecciona una categoría.
+            </p>
+          </div>
+
+          <!-- Descripción -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium mb-1">Descripción</label>
+            <textarea
+              [(ngModel)]="form.descripcion"
+              name="descripcion"
+              rows="3"
+              class="w-full p-2.5 border rounded-lg focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+          </div>
+
+          <!-- Imagen (archivo local con preview) -->
+          <div class="md:col-span-2">
+            <label class="block text-sm font-medium mb-1">Imagen del Producto</label>
+
+            <div class="flex items-center gap-4">
+              <input
+                type="file"
+                accept="image/*"
+                (change)="onFileSelected($event)"
+                class="block w-full text-sm text-slate-700
+                       file:mr-4 file:py-2 file:px-4
+                       file:rounded-lg file:border-0
+                       file:text-sm file:font-semibold
+                       file:bg-indigo-50 file:text-indigo-700
+                       hover:file:bg-indigo-100"
+              />
+
+              <!-- Preview -->
+              <div *ngIf="imagePreview || form.imagen" class="relative">
+                <div class="w-20 h-20 rounded overflow-hidden border">
+                  <img
+                    [src]="(imagePreview || form.imagen)!"
+                    alt="Vista previa"
+                    class="w-full h-full object-cover"
+                  />
+                </div>
+                <button
+                  type="button"
+                  (click)="removeImage()"
+                  class="absolute -top-2 -right-2 w-7 h-7 rounded-full bg-white border shadow
+                         hover:bg-slate-50 text-slate-700 text-xs"
+                  title="Quitar imagen"
+                >
+                  ✕
+                </button>
+              </div>
             </div>
+          </div>
+        </div> <!-- /GRID -->
+
+        <!-- Tallas -->
+        <div>
+          <label class="block text-sm font-medium mb-1">Tallas *</label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              *ngFor="let s of availableSizes"
+              (click)="toggleSize(s)"
+              [class.bg-blue-600]="form.talla.includes(s)"
+              [class.text-white]="form.talla.includes(s)"
+              class="px-2 py-1 border rounded"
+            >
+              {{ s }}
+            </button>
+          </div>
+          <p *ngIf="form.talla.length === 0 && f.submitted" class="text-xs text-rose-600 mt-1">
+            Selecciona al menos una talla.
+          </p>
+        </div>
+
+        <!-- Colores -->
+        <div>
+          <label class="block text-sm font-medium mb-1">Colores</label>
+          <div class="flex flex-wrap gap-2">
+            <button
+              type="button"
+              *ngFor="let c of availableColors"
+              (click)="toggleColor(c.value)"
+              [style.backgroundColor]="c.value"
+              [class.border-4]="form.color.includes(c.value)"
+              class="w-8 h-8 rounded-full border"
+              title="{{ c.name }}"
+            ></button>
           </div>
         </div>
 
-        <div class="flex flex-wrap gap-1">
-          <span *ngFor="let size of product.talla" class="px-2 py-1 border rounded text-xs">{{ size }}</span>
+        <!-- Footer -->
+        <div class="flex justify-end gap-2 pt-2">
+          <button type="button" (click)="closeModal()" class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300">
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            [disabled]="f.invalid || form.talla.length === 0 || form.categoriaId === 0 || form.precio <= 0"
+            class="px-4 py-2 rounded-lg text-white
+                   disabled:opacity-50 disabled:cursor-not-allowed
+                   bg-green-600 hover:bg-green-700"
+          >
+            {{ isEdit ? 'Actualizar' : 'Guardar' }}
+          </button>
         </div>
-      </div>
+      </form>
     </div>
   </div>
-</div>
+</section>

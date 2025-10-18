@@ -1,0 +1,135 @@
+<section (keydown)="onEsc($event)">
+  <div class="flex items-center justify-between mb-6">
+    <div>
+      <h1 class="text-3xl font-extrabold text-slate-900">Categorías</h1>
+      <p class="text-slate-500">Gestiona tus categorías de productos</p>
+    </div>
+
+    <!-- Abrir modal "Nueva Categoría" -->
+    <button
+      type="button"
+      (click)="openNew()"
+      class="px-4 py-2 rounded-xl bg-indigo-600 text-white hover:bg-indigo-700 transition"
+    >
+      Nueva Categoría
+    </button>
+  </div>
+
+  <div class="rounded-xl border border-slate-200 bg-white overflow-hidden">
+    <table class="min-w-full text-sm">
+      <thead class="bg-slate-50 text-slate-600">
+        <tr>
+          <th class="text-left px-4 py-3">ID</th>
+          <th class="text-left px-4 py-3">Nombre</th>
+          <th class="text-left px-4 py-3">Estado</th>
+          <th class="text-right px-4 py-3">Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody *ngIf="categorias.length; else emptyState">
+        <tr *ngFor="let c of categorias" class="border-t hover:bg-slate-50 transition">
+          <td class="px-4 py-3">{{ c.id }}</td>
+          <td class="px-4 py-3">{{ c.descripcion }}</td>
+          <td class="px-4 py-3">
+            <span
+              class="px-2 py-1 rounded-lg text-xs font-medium"
+              [class.bg-emerald-100]="c.estado"
+              [class.text-emerald-700]="c.estado"
+              [class.bg-slate-200]="!c.estado"
+              [class.text-slate-700]="!c.estado"
+            >
+              {{ c.estado ? 'Activo' : 'Inactivo' }}
+            </span>
+          </td>
+
+          <td class="px-4 py-3 text-right space-x-2">
+            <button
+              type="button"
+              (click)="openEdit(c)"
+              class="px-3 py-1.5 rounded-lg border hover:bg-slate-100 text-slate-700"
+            >
+              Editar
+            </button>
+
+            <button
+              type="button"
+              (click)="toggle(c)"
+              class="px-3 py-1.5 rounded-lg border hover:bg-slate-100"
+            >
+              {{ c.estado ? 'Desactivar' : 'Activar' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="p-12 text-center text-slate-500">No hay categorías registradas</div>
+    </ng-template>
+  </div>
+
+  <!-- ===== Modal de Crear/Editar Categoría ===== -->
+  <div
+    *ngIf="showModal"
+    class="fixed inset-0 z-50 flex items-center justify-center"
+    aria-modal="true"
+    role="dialog"
+  >
+    <!-- Fondo -->
+    <div class="absolute inset-0 bg-black/40" (click)="closeModal()"></div>
+
+    <!-- Contenido -->
+    <div class="relative bg-white w-full max-w-md mx-4 rounded-2xl shadow-xl border border-slate-200">
+      <!-- Header -->
+      <div class="px-5 py-4 border-b">
+        <h2 class="text-lg font-bold">
+          {{ isEdit ? 'Editar Categoría' : 'Nueva Categoría' }}
+        </h2>
+      </div>
+
+      <!-- Body (form) -->
+      <form (ngSubmit)="save()" class="px-5 py-4 space-y-4">
+        <!-- Descripción -->
+        <div>
+          <label class="block text-sm font-medium mb-1">Descripción *</label>
+          <input
+            [(ngModel)]="form.descripcion"
+            name="descripcion"
+            required
+            class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
+            placeholder="Ej. Camisas, Pantalones, Calzado"
+          />
+        </div>
+
+        <!-- Estado -->
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium">Estado</span>
+          <label class="inline-flex items-center cursor-pointer">
+            <input type="checkbox" [(ngModel)]="form.estado" name="estado" class="sr-only peer" />
+            <div class="w-11 h-6 bg-slate-200 rounded-full peer-checked:bg-emerald-500 relative transition-colors">
+              <div class="absolute top-0.5 left-0.5 w-5 h-5 bg-white rounded-full transition-transform peer-checked:translate-x-5"></div>
+            </div>
+            <span class="ml-3 text-sm text-slate-700">{{ form.estado ? 'Activo' : 'Inactivo' }}</span>
+          </label>
+        </div>
+
+        <!-- Footer buttons -->
+        <div class="flex justify-end gap-2 pt-2">
+          <button
+            type="button"
+            (click)="closeModal()"
+            class="px-4 py-2 rounded-lg bg-slate-200 hover:bg-slate-300"
+          >
+            Cancelar
+          </button>
+          <button
+            type="submit"
+            class="px-4 py-2 rounded-lg bg-green-600 text-white hover:bg-green-700"
+          >
+            {{ isEdit ? 'Actualizar' : 'Guardar' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</section>

@@ -5,10 +5,11 @@ import { Footer } from "./client/pages/layout/footer/footer";
 import { HeroSection } from "./client/pages/home/hero-section/hero-section";
 import { ProductsSection } from "./client/pages/home/products-section/products-section";
 import { OffersSection } from "./client/pages/home/offers-section/offers-section";
+import {  Dashboard } from "./admin/dashboard/dashboard";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, HeroSection, ProductsSection, OffersSection],
+  imports: [RouterOutlet, Navbar, Footer, HeroSection, ProductsSection, OffersSection, Dashboard],
   templateUrl: './app.html',
   styleUrl: './app.css'
 })
