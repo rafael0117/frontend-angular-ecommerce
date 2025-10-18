@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class CategoriaService {
-  private apiUrl = 'http://localhost:8182/api/categorias';
+  private apiUrl = 'http://localhost:8181/api/categorias';
 
   constructor(private http: HttpClient) {}
 

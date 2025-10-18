@@ -18,7 +18,7 @@ export class Categories implements OnInit {
   isEdit = false;
 
   // Modelo del formulario dentro del modal
-  form: Categoria = { id: '', descripcion: '', estado: true };
+  form: Categoria = { id: '', nombre: '', estado: true };
 
   constructor(private categoriaService: CategoriaService) {}
 
@@ -36,7 +36,7 @@ export class Categories implements OnInit {
   // Abrir modal para crear
   openNew(): void {
     this.isEdit = false;
-    this.form = { id: '', descripcion: '', estado: true };
+    this.form = { id: '', nombre: '', estado: true };
     this.showModal = true;
   }
 
@@ -54,7 +54,7 @@ export class Categories implements OnInit {
 
   // Guardar (crear/actualizar)
   save(): void {
-    if (!this.form.descripcion?.trim()) {
+    if (!this.form.nombre?.trim()) {
       alert('La descripción es obligatoria');
       return;
     }

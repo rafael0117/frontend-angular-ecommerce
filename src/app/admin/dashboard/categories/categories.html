@@ -29,7 +29,7 @@
       <tbody *ngIf="categorias.length; else emptyState">
         <tr *ngFor="let c of categorias" class="border-t hover:bg-slate-50 transition">
           <td class="px-4 py-3">{{ c.id }}</td>
-          <td class="px-4 py-3">{{ c.descripcion }}</td>
+          <td class="px-4 py-3">{{ c.nombre}}</td>
           <td class="px-4 py-3">
             <span
               class="px-2 py-1 rounded-lg text-xs font-medium"
@@ -93,7 +93,7 @@
         <div>
           <label class="block text-sm font-medium mb-1">Descripción *</label>
           <input
-            [(ngModel)]="form.descripcion"
+            [(ngModel)]="form.nombre"
             name="descripcion"
             required
             class="w-full p-2.5 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"

@@ -1,5 +1,5 @@
 export interface Categoria {
     id: string;
-    descripcion: string;
+    nombre: string;
     estado: boolean;
 }

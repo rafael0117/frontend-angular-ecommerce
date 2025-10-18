@@ -64,7 +64,7 @@ export class Products implements OnInit {
       next: cats => {
         this.categories = cats ?? [];
         this.categoriesMap = Object.fromEntries(
-          (cats ?? []).map(c => [c.id, c.descripcion])
+          (cats ?? []).map(c => [c.id, c.nombre])
         );
       },
       error: e => console.error('Error cargando categorías', e)
@@ -87,7 +87,7 @@ export class Products implements OnInit {
 
     // ✅ Tomar el nombre de categoría desde la lista cargada
     const cat = this.categories.find(c => ('' + c.id) === ('' + this.form.categoriaId));
-    this.form.categoriaNombre = cat?.descripcion || '';
+    this.form.categoriaNombre = cat?.nombre || '';
 
     if (this.isEdit && this.form.id) {
       this.productoService.updateProducto(this.form.id, this.form).subscribe({

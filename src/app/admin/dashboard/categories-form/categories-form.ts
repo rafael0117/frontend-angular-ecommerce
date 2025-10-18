@@ -17,7 +17,7 @@ export class CategoriesForm implements OnInit {
   isEdit = false;
 
   // ⚠️ tu interfaz es: { id: string; descripcion: string; estado: boolean }
-  category: Categoria = { id: '', descripcion: '', estado: true };
+  category: Categoria = { id: '', nombre: '', estado: true };
 
   constructor(
     private categoriaService: CategoriaService,
@@ -44,7 +44,7 @@ export class CategoriesForm implements OnInit {
   }
 
   saveCategory(): void {
-    if (!this.category.descripcion?.trim()) {
+    if (!this.category.nombre?.trim()) {
       alert('La descripción es obligatoria');
       return;
     }
