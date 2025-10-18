@@ -1,0 +1,31 @@
+<section class="py-16 px-4 sm:px-6 lg:px-8 bg-secondary">
+  <div class="max-w-7xl mx-auto">
+    <div class="text-center mb-12">
+      <span class="badge mb-4 bg-accent text-accent-foreground">Ofertas Especiales</span>
+      <h2 class="font-bold text-4xl sm:text-5xl mb-4">Descuentos Exclusivos</h2>
+      <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+        Aprovecha nuestras ofertas por tiempo limitado
+      </p>
+    </div>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+      <ng-container *ngFor="">
+        <div class="group overflow-hidden border hover:shadow-xl transition-shadow bg-card">
+          <div class="p-0">
+            <div class="relative overflow-hidden aspect-[3/4]">
+              <img [src]="" [alt]="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+              <span class="badge absolute top-4 right-4 bg-accent text-base px-3 py-1"></span>
+            </div>
+            <div class="p-6">
+              <h3 class="text-xl font-semibold mb-3"></h3>
+              <div class="flex items-center gap-3 mb-4">
+                <span class="text-2xl font-bold"></span>
+                <span class="text-lg text-muted-foreground line-through"></span>
+              </div>
+              <button class="btn btn-primary w-full">Comprar Ahora</button>
+            </div>
+          </div>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</section>

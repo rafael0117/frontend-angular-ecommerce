@@ -1,0 +1,68 @@
+<div class="p-6 max-w-lg mx-auto">
+  <h1 class="text-2xl font-bold mb-4">Nuevo Producto</h1>
+
+  <form (ngSubmit)="saveProduct()" class="space-y-4">
+    <div>
+      <label>Nombre *</label>
+      <input [(ngModel)]="product.nombre" name="nombre" required class="w-full p-2 border rounded" />
+    </div>
+
+    <div>
+      <label>Descripción</label>
+      <textarea [(ngModel)]="product.descripcion" name="descripcion" rows="4" class="w-full p-2 border rounded"></textarea>
+    </div>
+
+    <div>
+      <label>Precio *</label>
+      <input type="number" [(ngModel)]="product.precio" name="precio" required class="w-full p-2 border rounded" />
+    </div>
+
+    <div>
+      <label>Stock</label>
+      <input type="number" [(ngModel)]="product.stock" name="stock" class="w-full p-2 border rounded" />
+    </div>
+
+    <div>
+      <label>Categoría *</label>
+      <select [(ngModel)]="product.categoriaId" name="categoriaId" required class="w-full p-2 border rounded">
+        <option value="">Selecciona una categoría</option>
+        <option *ngFor="let cat of categories" [value]="cat.id">{{ cat.nombre }}</option>
+      </select>
+    </div>
+
+    <div>
+      <label>URL de Imagen</label>
+      <input type="url" [(ngModel)]="product.imagen" name="image" class="w-full p-2 border rounded" />
+    </div>
+
+    <div>
+      <label>Tallas Disponibles *</label>
+      <div class="flex gap-2 flex-wrap mt-1">
+        <button type="button" *ngFor="let size of availableSizes"
+                (click)="toggleSize(size)"
+                [class.bg-blue-600]="selectedSizes.includes(size)"
+                [class.text-white]="selectedSizes.includes(size)"
+                class="px-2 py-1 border rounded">
+          {{ size }}
+        </button>
+      </div>
+    </div>
+
+    <div>
+      <label>Colores Disponibles</label>
+      <div class="flex gap-2 flex-wrap mt-1">
+        <button type="button" *ngFor="let color of availableColors"
+                (click)="toggleColor(color.value)"
+                [style.backgroundColor]="color.value"
+                [class.border-4]="selectedColors.includes(color.value)"
+                class="w-8 h-8 rounded-full border">
+        </button>
+      </div>
+    </div>
+
+    <div class="flex gap-2 mt-4">
+      <button type="submit" class="px-4 py-2 bg-green-600 text-white rounded">Guardar</button>
+      <button type="button" class="px-4 py-2 bg-gray-300 rounded" (click)="router.navigate(['/dashboard/products'])">Cancelar</button>
+    </div>
+  </form>
+</div>

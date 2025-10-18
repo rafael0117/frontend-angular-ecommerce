@@ -1,0 +1,29 @@
+<section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+  <div class="text-center mb-12">
+    <h2 class="font-bold text-4xl sm:text-5xl mb-4">Nuestra Colección</h2>
+    <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
+      Piezas cuidadosamente seleccionadas para tu guardarropa esencial
+    </p>
+  </div>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+    <ng-container *ngFor="let producto of productos">
+      <div class="group overflow-hidden border hover:shadow-lg transition-shadow">
+        <div class="relative overflow-hidden aspect-[3/4]">
+          <img [src]="'assets/images/' + producto.imagen" [alt]="producto.nombre" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <div class="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors"></div>
+        </div>
+        <div class="p-4">
+          <p class="text-xs text-muted-foreground uppercase mb-1">{{ producto.categoriaNombre }}</p>
+          <h3 class="text-lg font-medium mb-2">{{ producto.nombre }}</h3>
+          <div class="flex items-center justify-between">
+            <span class="text-xl font-semibold text-foreground">{{ producto.precio | currency:'PEN' }}</span>
+            <button class="btn btn-outline">Agregar</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+  <div class="text-center mt-12">
+    <button class="btn btn-outline">Ver Toda la Colección</button>
+  </div>
+</section>
