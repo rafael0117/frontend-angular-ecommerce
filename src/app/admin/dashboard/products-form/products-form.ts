@@ -7,6 +7,8 @@ import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+
+
 @Component({
   selector: 'app-products-form',
   imports: [CommonModule,FormsModule,RouterModule],
@@ -15,7 +17,7 @@ import { FormsModule } from '@angular/forms';
 })
 export class ProductsForm {
  categories: Categoria[] = [];
-  product: Producto = { id: 0, nombre: '', descripcion: '', precio: 0, stock: 0,categoriaId:0, categoriaNombre: '', imagen: '', talla: [], color: [] };
+  product: Producto = { id: 0, nombre: '', descripcion: '', precio: 0, stock: 0,categoriaId:0, categoriaNombre: '', imagenesBase64: [], talla: [], color: [] };
   
   availableSizes = ["XS", "S", "M", "L", "XL", "XXL"];
   availableColors = [

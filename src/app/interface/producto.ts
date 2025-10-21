@@ -1,12 +1,15 @@
 export interface Producto {
-  id: number;
+  id: number;                 // para crear puedes usar 0 o no enviarlo
   nombre: string;
   descripcion: string;
   precio: number;
   stock: number;
-  talla: string[];   // <-- debe ser string[]
-  color: string[];
-  imagen: string;
-  categoriaId:number;
-  categoriaNombre: string;
+
+  categoriaId: number;
+  categoriaNombre?: string;   // opcional (si el back lo envía)
+
+  talla: string[];            // arrays
+  color: string[];            // arrays
+
+  imagenesBase64: string[];   // arrays con data:image/...;base64,XXXX
 }

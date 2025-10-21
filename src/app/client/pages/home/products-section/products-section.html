@@ -9,7 +9,7 @@
     <ng-container *ngFor="let producto of productos">
       <div class="group overflow-hidden border hover:shadow-lg transition-shadow">
         <div class="relative overflow-hidden aspect-[3/4]">
-          <img [src]="'assets/images/' + producto.imagen" [alt]="producto.nombre" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
+          <img [src]="'assets/images/' + producto.imagenesBase64" [alt]="producto.nombre" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
           <div class="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors"></div>
         </div>
         <div class="p-4">
