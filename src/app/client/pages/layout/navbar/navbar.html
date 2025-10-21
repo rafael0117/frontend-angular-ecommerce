@@ -5,6 +5,7 @@
       <a routerLink="/" class="flex items-center space-x-2">
         <div class="font-bold text-2xl tracking-tight text-foreground">LUXE</div>
       </a>
+
       <!-- Desktop Navigation -->
       <div class="hidden md:flex items-center space-x-8">
         <a routerLink="/" class="nav-link">Inicio</a>
@@ -12,7 +13,37 @@
         <a routerLink="/mujeres" class="nav-link">Mujeres</a>
         <a routerLink="/ofertas" class="nav-link text-accent">Ofertas</a>
         <a routerLink="/contacto" class="nav-link">Contacto</a>
+
+        <!-- SI NO hay sesión -> botón Login -->
+        <button
+          *ngIf="!(auth.isLoggedIn$ | async)"
+          class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+          (click)="showLoginModal = true"
+        >
+          Iniciar Sesión
+        </button>
+
+        <!-- SI hay sesión -> menú usuario -->
+        <div *ngIf="auth.isLoggedIn$ | async" class="flex items-center space-x-3">
+          <span class="text-sm text-foreground/80">Hola, {{ auth.displayUsername }}</span>
+
+          <a
+            *ngIf="auth.hasAnyRole(['ROLE_ADMIN','ROLE_SUPER'])"
+            routerLink="/admin/dashboard"
+            class="nav-link"
+          >
+            Dashboard
+          </a>
+
+          <button
+            class="px-3 py-2 rounded-lg border hover:bg-muted transition"
+            (click)="logout()"
+          >
+            Cerrar sesión
+          </button>
+        </div>
       </div>
+
       <!-- Cart & Mobile menu -->
       <div class="flex items-center space-x-4">
         <button class="relative">
@@ -25,6 +56,7 @@
       </div>
     </div>
   </div>
+
   <!-- Mobile Navigation -->
   <div *ngIf="mobileMenuOpen" class="md:hidden border-t border-border bg-background">
     <div class="px-4 py-6 space-y-4">
@@ -33,6 +65,28 @@
       <a routerLink="/mujeres" class="nav-link" (click)="toggleMobileMenu()">Mujeres</a>
       <a routerLink="/ofertas" class="nav-link text-accent" (click)="toggleMobileMenu()">Ofertas</a>
       <a routerLink="/contacto" class="nav-link" (click)="toggleMobileMenu()">Contacto</a>
+
+      <!-- Mobile: login o menú usuario -->
+      <button
+        *ngIf="!(auth.isLoggedIn$ | async)"
+        class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
+        (click)="showLoginModal = true; toggleMobileMenu()"
+      >
+        Iniciar Sesión
+      </button>
+
+      <div *ngIf="auth.isLoggedIn$ | async" class="flex items-center justify-between">
+        <span class="text-sm text-foreground/80">Hola, {{ auth.displayUsername }}</span>
+        <button class="px-3 py-2 rounded-lg border hover:bg-muted" (click)="logout(); toggleMobileMenu()">
+          Cerrar sesión
+        </button>
+      </div>
     </div>
   </div>
 </nav>
+
+<!-- Modal Login -->
+<app-login
+  [isOpen]="showLoginModal"
+  (isOpenChange)="showLoginModal = $event"
+></app-login>
