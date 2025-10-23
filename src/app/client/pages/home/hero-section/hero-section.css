@@ -1,3 +1,5 @@
-.banner{
-    background: url('../../../../../assets/images/banner.jpg') no-repeat center center fixed;
+.banner {
+  background: url('../../../../../assets/images/banner.jpg') no-repeat center center;
+  background-size: cover;
+  background-attachment: fixed; /* hace el efecto parallax */
 }
