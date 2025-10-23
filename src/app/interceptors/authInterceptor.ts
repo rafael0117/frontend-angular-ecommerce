@@ -1,26 +1,25 @@
-import { HttpInterceptorFn } from '@angular/common/http';
+// src/app/core/auth.interceptor.ts
+import { HttpInterceptorFn, HttpErrorResponse } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { Router } from '@angular/router';
+import { AuthService } from '../service/auth';
+import { catchError } from 'rxjs/operators';
+import { throwError } from 'rxjs';
 
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
-  const token = localStorage.getItem('token');
+  const auth = inject(AuthService);
+  const router = inject(Router);
 
-  const excludedUrls = ['/api/auth/login'];
-  const isExcluded = excludedUrls.some(url => req.url.includes(url));
+  const token = auth.accessToken;
+  const authReq = token ? req.clone({ setHeaders: { Authorization: `Bearer ${token}` } }) : req;
 
-  if (isExcluded) {
-    console.log('[Interceptor] Request excluida del Authorization:', req.url);
-    return next(req.clone({ withCredentials: true }));
-  }
-
-  let modifiedReq = req.clone({ withCredentials: true });
-
-  if (token) {
-    modifiedReq = modifiedReq.clone({
-      setHeaders: {
-        Authorization: `Bearer ${token}`
+  return next(authReq).pipe(
+    catchError((err: HttpErrorResponse) => {
+      // Si el backend devuelve 401/403, redirige a login (opcional)
+      if (err.status === 401 || err.status === 403) {
+        router.navigate(['/login'], { queryParams: { returnUrl: router.url } });
       }
-    });
-    console.log('[Interceptor] Agregando Authorization a:', req.url);
-  }
-
-  return next(modifiedReq);
+      return throwError(() => err);
+    })
+  );
 };
