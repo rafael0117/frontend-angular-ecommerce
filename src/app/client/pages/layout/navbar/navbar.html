@@ -48,7 +48,9 @@
       <div class="flex items-center space-x-4">
         <button class="relative">
           <span class="material-icons">shopping_bag</span>
-          <span class="cart-count">0</span>
+          <span class="cart-count">
+          {{ (cart.count$ | async) ?? 0 }}
+          </span>
         </button>
         <button class="md:hidden" (click)="toggleMobileMenu()">
           <span class="material-icons">{{ mobileMenuOpen ? 'close' : 'menu' }}</span>
