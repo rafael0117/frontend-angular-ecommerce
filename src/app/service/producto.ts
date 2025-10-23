@@ -1,26 +1,31 @@
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
 import { Producto } from '../interface/producto';
+import { Observable } from 'rxjs';
 
-@Injectable({
-  providedIn: 'root'
-})
+@Injectable({ providedIn: 'root' })
 export class ProductoService {
-  private apiUrl = 'http://localhost:8181/api/productos';
+  private API = 'http://localhost:8181/api'; // ajusta puerto si aplica
 
   constructor(private http: HttpClient) {}
 
   getProductos(): Observable<Producto[]> {
-    return this.http.get<Producto[]>(this.apiUrl);
+    return this.http.get<Producto[]>(`${this.API}/productos`);
   }
-  addProducto(producto:Producto): Observable<Producto>{
-    return this.http.post<Producto>(this.apiUrl,producto);
+
+  getProducto(id: number): Observable<Producto> {
+    return this.http.get<Producto>(`${this.API}/productos/${id}`);
   }
-  updateProducto(id:number,producto:Producto){
-    return this.http.put<Producto>(`${this.apiUrl}/${id}`,producto)
+
+  addProducto(body: Omit<Producto, 'id'>): Observable<Producto> {
+    return this.http.post<Producto>(`${this.API}/productos`, body);
   }
-  deleteProducto(id:number): Observable<void>{
-    return this.http.delete<void>(`${this.apiUrl}/${id}`);
+
+  updateProducto(id: number, body: Omit<Producto, 'id'>): Observable<Producto> {
+    return this.http.put<Producto>(`${this.API}/productos/${id}`, body);
+  }
+
+  deleteProducto(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.API}/productos/${id}`);
   }
 }

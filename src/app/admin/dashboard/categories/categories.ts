@@ -18,7 +18,7 @@ export class Categories implements OnInit {
   isEdit = false;
 
   // Modelo del formulario dentro del modal
-  form: Categoria = { id: '', nombre: '', estado: true };
+  form: Categoria = { id: 0, nombre: '', estado: true };
 
   constructor(private categoriaService: CategoriaService) {}
 
@@ -36,7 +36,7 @@ export class Categories implements OnInit {
   // Abrir modal para crear
   openNew(): void {
     this.isEdit = false;
-    this.form = { id: '', nombre: '', estado: true };
+    this.form = { id: 0, nombre: '', estado: true };
     this.showModal = true;
   }
 
@@ -54,42 +54,62 @@ export class Categories implements OnInit {
 
   // Guardar (crear/actualizar)
   save(): void {
-    if (!this.form.nombre?.trim()) {
-      alert('La descripción es obligatoria');
+  const nombre = this.form.nombre?.trim();
+  if (!nombre) {
+    alert('La descripción es obligatoria');
+    return;
+  }
+
+  // normaliza el payload
+  const payload: Categoria = {
+    id: this.form.id ?? undefined,           // mantiene undefined si no hay id
+    nombre,
+    estado: this.form.estado ?? true
+  };
+
+  if (this.isEdit) {
+    // --- actualizar ---
+    const id = Number(this.form.id);
+    if (Number.isNaN(id)) {
+      console.error('ID inválido para actualizar');
       return;
     }
 
-    if (this.isEdit) {
-      // actualizar
-      this.categoriaService.updateCategoria(this.form.id, this.form).subscribe({
-        next: () => {
-          this.closeModal();
-          this.listarCategorias(); // refrescar tabla
-        },
-        error: (e) => console.error('Error actualizando categoría', e)
-      });
-    } else {
-      // crear
-      if (!this.form.id) this.form.id = Date.now().toString(); // si tu backend lo asigna, quita esto
-      this.categoriaService.addCategoria(this.form).subscribe({
-        next: () => {
-          this.closeModal();
-          this.listarCategorias();
-        },
-        error: (e) => console.error('Error creando categoría', e)
-      });
-    }
+    this.categoriaService.updateCategoria(id, payload).subscribe({
+      next: () => {
+        this.closeModal();
+        this.listarCategorias();
+      },
+      error: (e) => console.error('Error actualizando categoría', e)
+    });
+
+  } else {
+    // --- crear ---
+    const { id, ...createPayload } = payload; // no enviar id en create
+    this.categoriaService.addCategoria(createPayload).subscribe({
+      next: () => {
+        this.closeModal();
+        this.listarCategorias();
+      },
+      error: (e) => console.error('Error creando categoría', e)
+    });
   }
+}
+
 
 toggle(cat: Categoria): void {
+  if (cat.id == null) {                      // id?: number
+    console.error('La categoría no tiene id');
+    return;
+  }
+
   const nuevoEstado = !cat.estado;
 
-  this.categoriaService.toggleCategoria(cat.id, nuevoEstado).subscribe({
+  this.categoriaService.toggleEstado(cat.id, nuevoEstado).subscribe({
     next: (updated) => {
-      // Actualizar el estado en el array local
-      cat.estado = updated.estado;
+      cat.estado = updated.estado;           // refresca estado en la UI
     },
-    error: (err) => console.error('Error al actualizar estado:', err)
+    error: (err) => console.error('Error al actualizar estado:', err),
   });
 }
 

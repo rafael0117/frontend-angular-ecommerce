@@ -16,8 +16,8 @@ import { Categoria } from '../../../interface/categoria';
 export class CategoriesForm implements OnInit {
   isEdit = false;
 
-  // ⚠️ tu interfaz es: { id: string; descripcion: string; estado: boolean }
-  category: Categoria = { id: '', nombre: '', estado: true };
+  // id como number (opcional), nombre y estado alineados con el back
+  categoria: Categoria = { id: undefined, nombre: '', estado: true };
 
   constructor(
     private categoriaService: CategoriaService,
@@ -26,39 +26,36 @@ export class CategoriesForm implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    const id = this.route.snapshot.paramMap.get('id'); // string | null
+    const idParam = this.route.snapshot.paramMap.get('id');   // string | null
+    const id = idParam !== null ? Number(idParam) : null;      // number | null
 
-    if (id) {
+    if (id !== null && !Number.isNaN(id)) {
       this.isEdit = true;
       this.categoriaService.getCategoriaById(id).subscribe({
-        next: (cat) => {
-          // Asegura que cat cumple la interfaz
-          this.category = { ...cat };
-        },
-        error: (err) => {
-          console.error('Error cargando categoría', err);
-          // opcional: navegar de vuelta o mostrar toast
-        }
+        next: (cat) => this.categoria = { ...cat },            // cat.id es number
+        error: (err) => console.error('Error cargando categoría', err),
       });
     }
   }
 
   saveCategory(): void {
-    if (!this.category.nombre?.trim()) {
-      alert('La descripción es obligatoria');
-      return;
-    }
+    // En template-driven, el payload es el propio this.categoria
+    const payload: Categoria = { ...this.categoria };
 
-    if (this.isEdit) {
+    if (this.isEdit && this.categoria.id != null) {
       this.categoriaService
-        .updateCategoria(this.category.id, this.category)
-        .subscribe(() => this.router.navigate(['/categories']));
+        .updateCategoria(this.categoria.id, payload)           // id: number
+        .subscribe({
+          next: () => this.router.navigate(['/categories']),
+          error: (e) => console.error('Error actualizando', e)
+        });
     } else {
-      // genera ID local si tu backend no lo genera
-      if (!this.category.id) this.category.id = Date.now().toString();
       this.categoriaService
-        .addCategoria(this.category)
-        .subscribe(() => this.router.navigate(['/categories']));
+        .addCategoria(payload)
+        .subscribe({
+          next: () => this.router.navigate(['/categories']),
+          error: (e) => console.error('Error creando', e)
+        });
     }
   }
 

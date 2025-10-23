@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, NgForm } from '@angular/forms';
 import { ProductoService } from '../../../service/producto';
 import { CategoriaService } from '../../../service/categoria';
 import { Producto } from '../../../interface/producto';
@@ -16,15 +16,15 @@ export class Products implements OnInit {
   // tabla
   products: Producto[] = [];
 
-  // ✅ Opción 1: lista de categorías + (opcional) map
-  categories: Categoria[] = [];                       // ← aquí la lista
-  categoriesMap: Record<string | number, string> = {}; // ← opcional
+  // categorías
+  categories: Categoria[] = [];
+  categoriesMap: Record<string | number, string> = {};
 
   // modal
   showModal = false;
   isEdit = false;
 
-  // modelo del formulario
+  // formulario
   form: Producto = {
     id: 0,
     nombre: '',
@@ -33,9 +33,9 @@ export class Products implements OnInit {
     stock: 0,
     categoriaId: 0,
     categoriaNombre: '',
-    imagen: '',
     talla: [],
-    color: []
+    color: [],
+    imagenesBase64: []
   };
 
   // helpers UI
@@ -51,6 +51,9 @@ export class Products implements OnInit {
     { name: 'Rosa', value: '#EC4899' }
   ];
 
+  // previews locales
+  previews: string[] = [];
+
   constructor(
     private productoService: ProductoService,
     private categoriaService: CategoriaService
@@ -59,7 +62,6 @@ export class Products implements OnInit {
   ngOnInit(): void {
     this.loadProducts();
 
-    // ✅ Cargar categorías y rellenar lista + mapa
     this.categoriaService.getCategorias().subscribe({
       next: cats => {
         this.categories = cats ?? [];
@@ -78,32 +80,40 @@ export class Products implements OnInit {
     });
   }
 
-   // guardar
-  save(): void {
-    if (!this.form.nombre?.trim() || !this.form.precio || !this.form.categoriaId || this.form.talla.length === 0) {
-      alert('Completa nombre, precio, categoría y al menos una talla.');
+  // --------- Guardar ----------
+  save(f: NgForm): void {
+    if (f.invalid || !this.form.precio || this.form.precio <= 0 || !this.form.categoriaId || this.form.talla.length === 0) {
+      alert('Completa nombre, precio (>0), categoría y al menos una talla.');
       return;
     }
 
-    // ✅ Tomar el nombre de categoría desde la lista cargada
+    // (opcional) setear nombre categoría para mostrar en tabla local sin esperar respuesta
     const cat = this.categories.find(c => ('' + c.id) === ('' + this.form.categoriaId));
     this.form.categoriaNombre = cat?.nombre || '';
 
-    if (this.isEdit && this.form.id) {
-      this.productoService.updateProducto(this.form.id, this.form).subscribe({
-        next: () => { this.closeModal(); this.loadProducts(); },
-        error: e => console.error('Error actualizando', e)
-      });
-    } else {
-      this.form.id = Date.now(); // si backend lo genera, quita esta línea
-      this.productoService.addProducto(this.form).subscribe({
-        next: () => { this.closeModal(); this.loadProducts(); },
-        error: e => console.error('Error creando', e)
-      });
-    }
+    const payload: Omit<Producto, 'id'> = {
+      nombre: this.form.nombre,
+      descripcion: this.form.descripcion || '',
+      precio: Number(this.form.precio),
+      stock: Number(this.form.stock || 0),
+      categoriaId: Number(this.form.categoriaId),
+      categoriaNombre: this.form.categoriaNombre, // el back puede ignorarlo
+      talla: [...(this.form.talla || [])],
+      color: [...(this.form.color || [])],
+      imagenesBase64: [...(this.form.imagenesBase64 || [])]
+    };
+
+    const obs = this.isEdit && this.form.id
+      ? this.productoService.updateProducto(this.form.id, payload)
+      : this.productoService.addProducto(payload);
+
+    obs.subscribe({
+      next: () => { this.closeModal(); this.loadProducts(); },
+      error: e => console.error('Error guardando', e)
+    });
   }
 
-  // (opcional) eliminar
+  // --------- Eliminar ----------
   delete(p: Producto): void {
     if (!confirm(`Eliminar ${p.nombre}?`)) return;
     this.productoService.deleteProducto(p.id).subscribe({
@@ -112,61 +122,74 @@ export class Products implements OnInit {
     });
   }
 
-
-  /// MODAL METHODS
-  // abrir modal - nuevo
+  // --------- Modal ----------
   openNew(): void {
     this.isEdit = false;
     this.form = {
-      id: 0, nombre: '', descripcion: '', precio: 0, stock: 0,
-      categoriaId: 0, categoriaNombre: '', imagen: '', talla: [], color: []
+      id: 0,
+      nombre: '',
+      descripcion: '',
+      precio: 0,
+      stock: 0,
+      categoriaId: 0,
+      categoriaNombre: '',
+      talla: [],
+      color: [],
+      imagenesBase64: []
     };
+    this.previews = [];
     this.showModal = true;
   }
 
-  // abrir modal - editar
   openEdit(p: Producto): void {
     this.isEdit = true;
-    this.form = { ...p, talla: [...(p.talla || [])], color: [...(p.color || [])] };
+    this.form = {
+      ...p,
+      categoriaId: Number(p.categoriaId),
+      talla: [...(p.talla || [])],
+      color: [...(p.color || [])],
+      imagenesBase64: [...(p.imagenesBase64 || [])]
+    };
+    this.previews = [...(this.form.imagenesBase64 || [])]; // mostrar lo que viene del back
     this.showModal = true;
   }
 
-  closeModal(): void { this.showModal = false; }
+  closeModal(): void {
+    this.showModal = false;
+  }
 
-  // toggles UI
+  // --------- Tallas/colores ----------
   toggleSize(size: string): void {
     const i = this.form.talla.indexOf(size);
     i >= 0 ? this.form.talla.splice(i, 1) : this.form.talla.push(size);
   }
+
   toggleColor(color: string): void {
     const i = this.form.color.indexOf(color);
     i >= 0 ? this.form.color.splice(i, 1) : this.form.color.push(color);
   }
 
- 
+  // --------- Imágenes múltiples (base64) ----------
+  onFilesSelected(evt: any): void {
+    const files: FileList | undefined = evt.target?.files;
+    if (!files || files.length === 0) return;
 
+    Array.from(files).forEach(file => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const b64 = reader.result as string; // data:image/...;base64,XXXX
+        this.form.imagenesBase64.push(b64);
+        this.previews.push(b64);
+      };
+      reader.readAsDataURL(file);
+    });
 
- // Propiedad para preview
-imagePreview: string | ArrayBuffer | null = null;
+    // permite volver a seleccionar las mismas imágenes
+    evt.target.value = '';
+  }
 
-// Al seleccionar archivo local
-onFileSelected(event: any): void {
-  const file = event.target.files?.[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = () => {
-    this.imagePreview = reader.result;
-    this.form.imagen = reader.result as string; // guarda base64
-  };
-  reader.readAsDataURL(file);
-}
-
-// Quitar imagen
-removeImage(): void {
-  this.imagePreview = null;
-  this.form.imagen = '';
-}
-
-
+  removeImageAt(i: number): void {
+    this.form.imagenesBase64.splice(i, 1);
+    this.previews.splice(i, 1);
+  }
 }
