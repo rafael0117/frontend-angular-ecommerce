@@ -46,12 +46,10 @@
 
       <!-- Cart & Mobile menu -->
       <div class="flex items-center space-x-4">
-        <button class="relative">
+        <a routerLink="/carrito" class="relative">
           <span class="material-icons">shopping_bag</span>
-          <span class="cart-count">
-          {{ (cart.count$ | async) ?? 0 }}
-          </span>
-        </button>
+          <span class="cart-count">{{ (cart.count$ | async) ?? 0 }}</span>
+        </a>
         <button class="md:hidden" (click)="toggleMobileMenu()">
           <span class="material-icons">{{ mobileMenuOpen ? 'close' : 'menu' }}</span>
         </button>
@@ -79,7 +77,8 @@
 
       <div *ngIf="auth.isLoggedIn$ | async" class="flex items-center justify-between">
         <span class="text-sm text-foreground/80">Hola, {{ auth.displayUsername }}</span>
-        <button class="px-3 py-2 rounded-lg border hover:bg-muted" (click)="logout(); toggleMobileMenu()">
+        <button class="px-3 py-2 rounded-lg border hover:bg-muted"
+                (click)="logout(); toggleMobileMenu()">
           Cerrar sesión
         </button>
       </div>
