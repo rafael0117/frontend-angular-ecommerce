@@ -1,0 +1,72 @@
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+  <h1 class="text-3xl font-bold mb-6">Tu Carrito</h1>
+
+  <ng-container *ngIf="carrito$ | async as cart; else cargando">
+    <ng-container *ngIf="cart?.detalles?.length; else vacio">
+      <div class="overflow-x-auto border rounded">
+        <table class="min-w-full text-sm">
+          <thead class="bg-muted/50 text-left">
+            <tr>
+              <th class="p-3 font-medium">Producto</th>
+              <th class="p-3 font-medium">Precio</th>
+              <th class="p-3 font-medium">Cantidad</th>
+              <th class="p-3 font-medium">Subtotal</th>
+              <th class="p-3"></th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let d of cart.detalles; trackBy: trackByDetalle" class="border-t">
+              <td class="p-3">
+                <div class="font-medium">{{ d.nombreProducto }}</div>
+                <div class="text-xs text-muted-foreground">
+                  <ng-container *ngIf="d.talla">Talla: {{ d.talla }} · </ng-container>
+                  <ng-container *ngIf="d.color">Color: {{ d.color }}</ng-container>
+                </div>
+              </td>
+              <td class="p-3">{{ d.precio | currency:'PEN':'symbol':'1.2-2' }}</td>
+              <td class="p-3">{{ d.cantidad }}</td>
+              <td class="p-3 font-semibold">
+                {{ (d.precio * d.cantidad) | currency:'PEN':'symbol':'1.2-2' }}
+              </td>
+              <td class="p-3 text-right">
+                <button class="btn-outline" (click)="eliminar(d)">Eliminar</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="grid md:grid-cols-3 gap-6 mt-6">
+        <div class="md:col-span-2">
+          <button class="btn-outline" (click)="continuarComprando()">← Seguir comprando</button>
+        </div>
+
+        <div class="resumen">
+          <div class="fila">
+            <span class="muted">Items</span>
+            <span>{{ totalItems(cart) }}</span>
+          </div>
+          <div class="fila total">
+            <span>Total</span>
+            <span>{{ total(cart) | currency:'PEN':'symbol':'1.2-2' }}</span>
+          </div>
+          <div class="acciones">
+            <button class="btn-primary" (click)="irAPagar()">Ir a pagar</button>
+            <button class="btn-outline" (click)="vaciar()">Vaciar</button>
+          </div>
+        </div>
+      </div>
+    </ng-container>
+
+    <ng-template #vacio>
+      <div class="border rounded p-8 text-center">
+        <p class="text-lg">Tu carrito está vacío.</p>
+        <button class="btn-outline mt-4" (click)="continuarComprando()">Ir a la tienda</button>
+      </div>
+    </ng-template>
+  </ng-container>
+
+  <ng-template #cargando>
+    <div class="p-8 text-center text-muted-foreground">Cargando carrito...</div>
+  </ng-template>
+</section>
