@@ -10,12 +10,30 @@
     <ng-container *ngFor="let producto of productos">
       <div class="group overflow-hidden border hover:shadow-lg transition-shadow">
         <div class="relative overflow-hidden aspect-[3/4]">
-          <img
-            [src]="'assets/images/' + producto.imagen"
-            [alt]="producto.nombre"
-            class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
-          />
-          <div class="absolute inset-0 bg-foreground/0 group-hover:bg-foreground/10 transition-colors"></div>
+          <ng-container *ngIf="producto.imagenesBase64?.length; else sinImg">
+            <!-- Imagen principal usando el helper -->
+            <img
+              [src]="getImagen(producto)"
+              [alt]="producto.nombre"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              (error)="onImgError($event)"
+            />
+
+            <!-- Thumbnails -->
+            <div class="absolute left-2 bottom-2 flex gap-1">
+              <img
+                *ngFor="let thumb of producto.imagenesBase64; let i = index"
+                [src]="thumb"
+                class="w-10 h-10 object-cover border cursor-pointer"
+                (click)="cambiarImagen(producto, i)"
+                (error)="onImgError($event)"
+              />
+            </div>
+          </ng-container>
+
+          <ng-template #sinImg>
+            <img src="assets/images/placeholder.jpg" class="w-full h-full object-cover" />
+          </ng-template>
         </div>
 
         <div class="p-4">
@@ -39,7 +57,6 @@
               </ng-container>
               <ng-template #loadingTpl>Agregando...</ng-template>
             </button>
-
           </div>
         </div>
       </div>
