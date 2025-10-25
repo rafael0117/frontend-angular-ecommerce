@@ -1,72 +1,113 @@
 <section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-  <h1 class="text-3xl font-bold mb-6">Tu Carrito</h1>
+  <h1 class="text-3xl font-bold mb-6 tracking-tight">Tu Carrito</h1>
 
   <ng-container *ngIf="carrito$ | async as cart; else cargando">
     <ng-container *ngIf="cart?.detalles?.length; else vacio">
-      <div class="overflow-x-auto border rounded">
-        <table class="min-w-full text-sm">
-          <thead class="bg-muted/50 text-left">
-            <tr>
-              <th class="p-3 font-medium">Producto</th>
-              <th class="p-3 font-medium">Precio</th>
-              <th class="p-3 font-medium">Cantidad</th>
-              <th class="p-3 font-medium">Subtotal</th>
-              <th class="p-3"></th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let d of cart.detalles; trackBy: trackByDetalle" class="border-t">
-              <td class="p-3">
-                <div class="font-medium">{{ d.nombreProducto }}</div>
-                <div class="text-xs text-muted-foreground">
-                  <ng-container *ngIf="d.talla">Talla: {{ d.talla }} · </ng-container>
-                  <ng-container *ngIf="d.color">Color: {{ d.color }}</ng-container>
-                </div>
-              </td>
-              <td class="p-3">{{ d.precio | currency:'PEN':'symbol':'1.2-2' }}</td>
-              <td class="p-3">{{ d.cantidad }}</td>
-              <td class="p-3 font-semibold">
-                {{ (d.precio * d.cantidad) | currency:'PEN':'symbol':'1.2-2' }}
-              </td>
-              <td class="p-3 text-right">
-                <button class="btn-outline" (click)="eliminar(d)">Eliminar</button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
+      <div class="overflow-hidden rounded-2xl border shadow-sm">
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead class="bg-gray-50 dark:bg-gray-800/50 text-left sticky top-0 z-10">
+              <tr class="text-gray-600 dark:text-gray-300">
+                <th class="p-4 font-semibold">Producto</th>
+                <th class="p-4 font-semibold">Precio</th>
+                <th class="p-4 font-semibold">Cantidad</th>
+                <th class="p-4 font-semibold">Subtotal</th>
+                <th class="p-4"></th>
+              </tr>
+            </thead>
+            <tbody class="divide-y">
+              <tr
+                *ngFor="let d of cart.detalles; trackBy: trackByDetalle"
+                class="hover:bg-gray-50/70 dark:hover:bg-gray-800/50 transition-colors"
+              >
+                <td class="p-4 align-top">
+                  <div class="font-medium text-gray-900 dark:text-gray-100">{{ d.nombreProducto }}</div>
+                  <div class="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
+                    <ng-container *ngIf="d.talla">Talla: {{ d.talla }} · </ng-container>
+                    <ng-container *ngIf="d.color">Color: {{ d.color }}</ng-container>
+                  </div>
+                </td>
+                <td class="p-4 align-top tabular-nums">{{ d.precio | currency:'PEN':'symbol':'1.2-2' }}</td>
+                <td class="p-4 align-top">{{ d.cantidad }}</td>
+                <td class="p-4 align-top font-semibold tabular-nums">
+                  {{ (d.precio * d.cantidad) | currency:'PEN':'symbol':'1.2-2' }}
+                </td>
+                <td class="p-4 align-top text-right">
+                  <button
+                    class="inline-flex items-center px-3 py-2 rounded-xl border shadow-sm hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/60"
+                    (click)="eliminar(d)"
+                  >
+                    Eliminar
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+            <tfoot class="bg-gray-50/60 dark:bg-gray-800/40">
+              <tr>
+                <td colspan="5" class="p-3 text-xs text-gray-500 dark:text-gray-400">
+                  * Los precios incluyen IGV cuando corresponda.
+                </td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
       </div>
 
       <div class="grid md:grid-cols-3 gap-6 mt-6">
         <div class="md:col-span-2">
-          <button class="btn-outline" (click)="continuarComprando()">← Seguir comprando</button>
+          <button
+            class="inline-flex items-center gap-2 px-4 py-2 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/60"
+            (click)="continuarComprando()"
+          >
+            ← Seguir comprando
+          </button>
         </div>
 
-        <div class="resumen">
-          <div class="fila">
-            <span class="muted">Items</span>
-            <span>{{ totalItems(cart) }}</span>
+        <div class="rounded-2xl border p-5 shadow-sm md:sticky md:top-6 bg-white/70 dark:bg-gray-900/70 backdrop-blur">
+          <div class="flex items-center justify-between py-2">
+            <span class="text-sm text-gray-500 dark:text-gray-400">Items</span>
+            <span class="font-medium">{{ totalItems(cart) }}</span>
           </div>
-          <div class="fila total">
-            <span>Total</span>
-            <span>{{ total(cart) | currency:'PEN':'symbol':'1.2-2' }}</span>
+
+          <div class="flex items-center justify-between py-3 border-t mt-2">
+            <span class="text-base font-semibold">Total</span>
+            <span class="text-lg font-bold tabular-nums">
+              {{ total(cart) | currency:'PEN':'symbol':'1.2-2' }}
+            </span>
           </div>
-          <div class="acciones">
-            <button class="btn-primary" (click)="irAPagar()">Ir a pagar</button>
-            <button class="btn-outline" (click)="vaciar()">Vaciar</button>
+
+          <div class="mt-4 grid gap-3">
+            <button
+              class="inline-flex justify-center items-center px-4 py-2.5 rounded-xl font-medium bg-indigo-600 text-white hover:bg-indigo-700 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 disabled:opacity-50"
+              (click)="irAPagar()"
+            >
+              Ir a pagar
+            </button>
+            <button
+              class="inline-flex justify-center items-center px-4 py-2.5 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/60"
+              (click)="vaciar()"
+            >
+              Vaciar
+            </button>
           </div>
         </div>
       </div>
     </ng-container>
 
     <ng-template #vacio>
-      <div class="border rounded p-8 text-center">
+      <div class="border rounded-2xl p-10 text-center shadow-sm">
         <p class="text-lg">Tu carrito está vacío.</p>
-        <button class="btn-outline mt-4" (click)="continuarComprando()">Ir a la tienda</button>
+        <button
+          class="inline-flex mt-4 items-center px-4 py-2 rounded-xl border hover:bg-gray-50 dark:hover:bg-gray-800 shadow-sm focus:outline-none focus-visible:ring-2 focus-visible:ring-gray-400/60"
+          (click)="continuarComprando()"
+        >
+          Ir a la tienda
+        </button>
       </div>
     </ng-template>
   </ng-container>
 
   <ng-template #cargando>
-    <div class="p-8 text-center text-muted-foreground">Cargando carrito...</div>
+    <div class="p-8 text-center text-gray-500 dark:text-gray-400 animate-pulse">Cargando carrito...</div>
   </ng-template>
 </section>
