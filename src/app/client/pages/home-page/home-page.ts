@@ -9,6 +9,7 @@ import { HeroSection } from '../home/hero-section/hero-section';
    imports: [CommonModule, HeroSection, ProductsSection, OffersSection],
   templateUrl: './home-page.html',
   styleUrl: './home-page.css'
+  
 })
 export class HomePage {
 

@@ -5,13 +5,14 @@ import { Footer } from "./client/pages/layout/footer/footer";
 import { HeroSection } from "./client/pages/home/hero-section/hero-section";
 import { ProductsSection } from "./client/pages/home/products-section/products-section";
 import { OffersSection } from "./client/pages/home/offers-section/offers-section";
-import {  Dashboard } from "./admin/dashboard/dashboard";
+import { AuthShellComponent } from "./auth/AuthShellComponent";
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, Navbar, Footer, HeroSection, ProductsSection, OffersSection, Dashboard],
+  standalone: true,
+  imports: [RouterOutlet, Navbar, Footer],
   templateUrl: './app.html',
-  styleUrl: './app.css'
+  styleUrls: ['./app.css']
 })
 export class App {
   protected readonly title = signal('tienda-ropa');

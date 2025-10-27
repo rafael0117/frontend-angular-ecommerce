@@ -11,15 +11,12 @@
       <div class="group overflow-hidden border hover:shadow-lg transition-shadow">
         <div class="relative overflow-hidden aspect-[3/4]">
           <ng-container *ngIf="producto.imagenesBase64?.length; else sinImg">
-            <!-- Imagen principal usando el helper -->
             <img
               [src]="getImagen(producto)"
               [alt]="producto.nombre"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
               (error)="onImgError($event)"
             />
-
-            <!-- Thumbnails -->
             <div class="absolute left-2 bottom-2 flex gap-1">
               <img
                 *ngFor="let thumb of producto.imagenesBase64; let i = index"
@@ -30,23 +27,17 @@
               />
             </div>
           </ng-container>
-
           <ng-template #sinImg>
             <img src="assets/images/placeholder.jpg" class="w-full h-full object-cover" />
           </ng-template>
         </div>
 
         <div class="p-4">
-          <p class="text-xs text-muted-foreground uppercase mb-1">
-            {{ producto.categoriaNombre }}
-          </p>
+          <p class="text-xs text-muted-foreground uppercase mb-1">{{ producto.categoriaNombre }}</p>
           <h3 class="text-lg font-medium mb-2">{{ producto.nombre }}</h3>
 
           <div class="flex items-center justify-between">
-            <span class="text-xl font-semibold text-foreground">
-              {{ producto.precio | currency:'PEN' }}
-            </span>
-
+            <span class="text-xl font-semibold text-foreground">{{ producto.precio | currency:'PEN' }}</span>
             <button
               class="btn btn-outline"
               [disabled]="loadingId === producto.id"
@@ -66,4 +57,7 @@
   <div class="text-center mt-12">
     <button class="btn btn-outline">Ver Toda la Colección</button>
   </div>
+
+  <!-- Modal de Login -->
+  <app-login *ngIf="showLoginModal" (close)="showLoginModal = false"></app-login>
 </section>

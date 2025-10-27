@@ -1,0 +1,65 @@
+<div class="p-6 max-w-3xl mx-auto bg-white shadow rounded-lg">
+  <h2 class="text-xl font-semibold mb-4">Crear Pedido</h2>
+
+  <div class="mb-4">
+    <label class="block text-sm font-medium mb-1">Dirección de envío</label>
+    <input
+      type="text"
+      [(ngModel)]="direccionEnvio"
+      class="w-full border border-gray-300 rounded px-3 py-2"
+      placeholder="Ej. Av. Los Olivos 123"
+    />
+  </div>
+
+  <div class="mb-4">
+    <label for="metodo" class="block text-sm font-medium mb-1">Método de Pago</label>
+    <select id="metodo" [(ngModel)]="metodoPago" name="metodoPago"
+            class="w-full border border-gray-300 rounded px-3 py-2">
+      <option *ngFor="let metodo of metodosPago" [value]="metodo">
+        {{ metodo }}
+      </option>
+    </select>
+  </div>
+
+  <button
+    (click)="crearPedido()"
+    class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded mb-4"
+    [disabled]="cargando"
+  >
+    {{ cargando ? 'Procesando...' : 'Crear Pedido' }}
+  </button>
+
+  <p *ngIf="mensaje" class="mb-4 text-sm text-gray-700">{{ mensaje }}</p>
+
+  <div *ngIf="pedido">
+    <h3 class="font-bold text-lg mb-2">Resumen del Pedido #{{ pedido.id }}</h3>
+    <p><strong>Dirección:</strong> {{ pedido.direccionEnvio }}</p>
+    <p><strong>Método de Pago:</strong> {{ pedido.metodoPago }}</p>
+    <p><strong>Estado:</strong> {{ pedido.estado }}</p>
+    <p><strong>Total:</strong> S/ {{ pedido.total | number: '1.2-2' }}</p>
+
+    <h4 class="font-semibold mt-4 mb-2">Detalles:</h4>
+    <table class="w-full border border-gray-200">
+      <thead class="bg-gray-100">
+        <tr>
+          <th class="p-2 text-left">Producto</th>
+          <th class="p-2 text-left">Cantidad</th>
+          <th class="p-2 text-left">Precio</th>
+          <th class="p-2 text-left">Tallas</th>
+          <th class="p-2 text-left">Colores</th>
+          <th class="p-2 text-left">Subtotal</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let item of detalles" class="border-t">
+          <td class="p-2">{{ item.nombreProducto }}</td>
+          <td class="p-2">{{ item.cantidad }}</td>
+          <td class="p-2">S/ {{ item.precio | number: '1.2-2' }}</td>
+          <td class="p-2">{{ item.tallas.join(', ') }}</td>
+          <td class="p-2">{{ item.colores.join(', ') }}</td>
+          <td class="p-2">S/ {{ item.subtotal | number: '1.2-2' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>

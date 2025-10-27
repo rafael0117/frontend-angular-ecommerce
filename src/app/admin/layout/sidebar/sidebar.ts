@@ -18,10 +18,11 @@ export class Sidebar implements OnInit {
   collapsed = false;
   brand = 'Fashion Store';
 
+  // RUTAS RELATIVAS (sin slash)
   menu: MenuItem[] = [
-    { icon: '📊', label: 'Dashboard', path: '/dashboard', exact: true },
-    { icon: '📦', label: 'Productos', path: '/products' },
-    { icon: '🏷️', label: 'Categorías', path: '/categories' }
+    { icon: '📊', label: 'Dashboard',  path: 'dashboard',  exact: true },
+    { icon: '📦', label: 'Productos',  path: 'products' },
+    { icon: '🏷️', label: 'Categorías', path: 'categories' }
   ];
 
   ngOnInit(): void {
@@ -33,8 +34,4 @@ export class Sidebar implements OnInit {
     this.collapsed = !this.collapsed;
     localStorage.setItem('sidebar:collapsed', this.collapsed ? '1' : '0');
   }
-
-  /* logout(): void {
-    this.auth.logout(); // si tienes angular-oauth2-oidc hará redirect
-  }*/
 }

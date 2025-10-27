@@ -18,7 +18,7 @@
         <button
           *ngIf="!(auth.isLoggedIn$ | async)"
           class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-          (click)="showLoginModal = true"
+          (click)="openLogin()"
         >
           Iniciar Sesión
         </button>
@@ -70,7 +70,7 @@
       <button
         *ngIf="!(auth.isLoggedIn$ | async)"
         class="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition"
-        (click)="showLoginModal = true; toggleMobileMenu()"
+        (click)="openLogin(); toggleMobileMenu()"
       >
         Iniciar Sesión
       </button>
@@ -90,4 +90,12 @@
 <app-login
   [isOpen]="showLoginModal"
   (isOpenChange)="showLoginModal = $event"
-></app-login>
+  (requestRegister)="openRegister()">
+</app-login>
+
+<!-- Modal Registro -->
+<app-register
+  [isOpen]="showRegisterModal"
+  (isOpenChange)="showRegisterModal = $event"
+  (requestLogin)="openLogin()">
+</app-register>

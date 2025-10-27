@@ -1,38 +1,45 @@
 // src/app/app.routes.ts
 import { Routes } from '@angular/router';
 
-// Público
-import { ProductsSection } from './client/pages/home/products-section/products-section';
+// Layouts
+import { AdminLayout } from './admin/layout/admin-layout/admin-layout';
 
-import { Login } from './auth/login/login';
+// Páginas públicas
+import { HomePage } from './client/pages/home-page/home-page';
+import { Cart } from './client/pages/cart/cart';
+import { Pedido } from './client/pages/pedido/pedido';
+import { AuthShellComponent } from './auth/AuthShellComponent';
+// Si usas <app-register> como modal desde navbar, no necesitas ruta /register.
+// Si igual quieres ruta directa:
+import { Register } from './auth/register/register';
 
 // Admin
-import { AdminLayout } from './admin/layout/admin-layout/admin-layout';
 import { Dashboard } from './admin/dashboard/dashboard';
 import { Products } from './admin/dashboard/products/products';
 import { ProductsForm } from './admin/dashboard/products-form/products-form';
 import { Categories } from './admin/dashboard/categories/categories';
 import { CategoriesForm } from './admin/dashboard/categories-form/categories-form';
-import { Cart } from './client/pages/cart/cart';
-import { HomePage } from './client/pages/home-page/home-page';
-
-
+import { PublicLayout } from './client/pages/public-layout/public-layout';
 
 export const routes: Routes = [
-  // === Público (similar a: '', login, register, viajes-destino/:id, viaje/:id) ===
-  { path: '', component: HomePage },          // Home (listado)
-  { path: 'login', component: Login },
+  // ====== LAYOUT PÚBLICO (Navbar + Footer) ======
+  {
+    path: '',
+    component: PublicLayout,
+    children: [
+      { path: '', component: HomePage },
+      { path: 'carrito', component: Cart },
+      { path: 'checkout', component: Pedido },
+      { path: 'auth', component: AuthShellComponent }, // si quieres mantener el shell por URL
+      { path: 'register', component: Register },       // opcional (si quieres ruta directa)
+    ],
+  },
 
-  // Detalle de producto (equivalente a viaje/:id)
-
-  // Carrito (equivalente a otra página pública)
-  { path: 'carrito', component: Cart },
-
-  // === Admin con children (similar a dashboard con hijos) ===
+  // ====== LAYOUT ADMIN (sin Navbar/Footer) ======
   {
     path: 'admin',
     component: AdminLayout,
-
+    // canActivate: [AuthGuard, RoleAdminGuard], // si tienes guards
     children: [
       { path: '', redirectTo: 'dashboard', pathMatch: 'full' },
       { path: 'dashboard', component: Dashboard },
@@ -40,10 +47,10 @@ export const routes: Routes = [
       { path: 'products/new', component: ProductsForm },
       { path: 'categories', component: Categories },
       { path: 'categories/new', component: CategoriesForm },
-      { path: 'categories/:id/edit', component: CategoriesForm }
-    ]
+      { path: 'categories/:id/edit', component: CategoriesForm },
+    ],
   },
 
   // 404
-  { path: '**', redirectTo: '' }
+  { path: '**', redirectTo: '' },
 ];
