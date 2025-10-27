@@ -5,20 +5,21 @@ import { ToastrService } from 'ngx-toastr';
 
 import { ProductoService } from '../../../../service/producto';
 import { Producto } from '../../../../interface/producto';
-
 import { AuthService } from '../../../../service/auth';
 import { CarritoService } from '../../../../service/carrito';
+import { Login } from "../../../../auth/login/login";
 
 @Component({
   selector: 'app-products-section',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, Login],
   templateUrl: './products-section.html',
   styleUrls: ['./products-section.css']
 })
 export class ProductsSection implements OnInit {
   productos: Producto[] = [];
   loadingId: number | null = null;
+  showLoginModal = false; // control del modal de login
 
   constructor(
     private productoService: ProductoService,
@@ -31,7 +32,6 @@ export class ProductsSection implements OnInit {
   ngOnInit() {
     this.productoService.getProductos().subscribe({
       next: (data) => {
-        // Normaliza por si alguna imagen viniera sin prefijo data:
         this.productos = (data || []).map(p => ({
           ...p,
           imagenesBase64: (p.imagenesBase64 || []).map(img =>
@@ -43,13 +43,12 @@ export class ProductsSection implements OnInit {
     });
   }
 
-  // Imagen principal (con fallback)
+  // Imagen principal
   getImagen(prod: Producto): string {
     const img = prod?.imagenesBase64?.[0];
     return img && img.length > 50 ? img : 'assets/images/placeholder.jpg';
   }
 
-  // Cambia la imagen principal por la thumbnail clickeada
   cambiarImagen(prod: Producto, index: number) {
     if (!prod?.imagenesBase64?.[index]) return;
     const imgs = [...prod.imagenesBase64];
@@ -57,7 +56,6 @@ export class ProductsSection implements OnInit {
     prod.imagenesBase64 = imgs;
   }
 
-  // Si falla la carga, usa placeholder
   onImgError(ev: Event) {
     (ev.target as HTMLImageElement).src = 'assets/images/placeholder.jpg';
   }
@@ -65,7 +63,7 @@ export class ProductsSection implements OnInit {
   agregar(producto: Producto) {
     if (!this.auth.isAuthenticated()) {
       this.toastr.info('Inicia sesión para agregar al carrito');
-      this.router.navigate(['/login'], { queryParams: { returnUrl: this.router.url } });
+      this.showLoginModal = true; // abrir modal de login
       return;
     }
 

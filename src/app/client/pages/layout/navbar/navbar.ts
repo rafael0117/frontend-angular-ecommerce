@@ -4,38 +4,39 @@ import { RouterModule } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { distinctUntilChanged } from 'rxjs/operators';
 
-import { Login } from '../../../../auth/login/login';          // modal standalone
+import { Login } from '../../../../auth/login/login';
+import { Register } from '../../../../auth/register/register';
 import { AuthService } from '../../../../service/auth';
 import { CarritoService } from '../../../../service/carrito';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, Login],
+  imports: [CommonModule, RouterModule, Login, Register],
   templateUrl: './navbar.html',
   styleUrls: ['./navbar.css']
 })
 export class Navbar implements OnInit, OnDestroy {
   mobileMenuOpen = false;
   showLoginModal = false;
+  showRegisterModal = false;
 
   private sub?: Subscription;
 
-  // public para usarlos en la plantilla
   constructor(
     public auth: AuthService,
     public cart: CarritoService
   ) {}
 
   ngOnInit(): void {
-    // Carga inicial si ya hay sesión al entrar
+    // Cargar carrito si ya hay sesión
     if (this.auth.isAuthenticated()) {
       this.cart.cargarMiCarrito().subscribe();
     } else {
       this.cart.reset();
     }
 
-    // Cuando cambia el estado de login, carga/limpia el carrito
+    // Escuchar cambios de login
     this.sub = this.auth.isLoggedIn$
       .pipe(distinctUntilChanged())
       .subscribe(isIn => {
@@ -55,11 +56,22 @@ export class Navbar implements OnInit, OnDestroy {
     this.mobileMenuOpen = !this.mobileMenuOpen;
   }
 
+  openLogin(): void {
+    this.showRegisterModal = false;
+    this.showLoginModal = true;
+  }
+
+  openRegister(): void {
+    this.showLoginModal = false;
+    this.showRegisterModal = true;
+  }
+
   logout(): void {
     this.auth.logoutAllServerSide().subscribe(() => {
-      this.cart.reset();           // asegurar limpieza
-      this.showLoginModal = false; // por si estaba abierto
-      this.mobileMenuOpen = false; // cierra menú móvil
+      this.cart.reset();
+      this.showLoginModal = false;
+      this.showRegisterModal = false;
+      this.mobileMenuOpen = false;
     });
   }
 }

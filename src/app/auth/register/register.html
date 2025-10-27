@@ -1,0 +1,53 @@
+<div *ngIf="isOpen"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+     role="dialog" aria-modal="true" aria-labelledby="register-title"
+     (click)="close()">
+  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-full max-w-md p-6 relative"
+       (click)="$event.stopPropagation()">
+    <button (click)="close()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" aria-label="Cerrar modal">✕</button>
+
+    <h2 id="register-title" class="text-2xl font-bold text-center mb-5 text-gray-800 dark:text-gray-100">Crear cuenta</h2>
+
+    <form #f="ngForm" (ngSubmit)="submit(f)">
+      <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Usuario (email o nombre)</label>
+        <input id="username" name="username" [(ngModel)]="username" required
+               autocomplete="username" inputmode="email"
+               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" autofocus />
+        <small *ngIf="f.submitted && !username" class="text-red-600">Usuario requerido</small>
+      </div>
+
+      <div class="mb-4">
+        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Contraseña</label>
+        <div class="relative">
+          <input [type]="showPassword ? 'text' : 'password'" id="password" name="password"
+                 [(ngModel)]="password" required minlength="6" autocomplete="new-password"
+                 class="mt-1 w-full px-3 py-2 border rounded-lg pr-16 focus:ring-2 focus:ring-blue-500"/>
+          <button type="button" (click)="togglePassword()"
+                  class="absolute inset-y-0 right-0 px-3 text-sm text-gray-500">
+            {{ showPassword ? 'Ocultar' : 'Mostrar' }}
+          </button>
+        </div>
+        <small *ngIf="f.submitted && (!password || password.length<6)" class="text-red-600">Mínimo 6 caracteres</small>
+      </div>
+
+      <div class="mb-4">
+        <label class="inline-flex items-center">
+          <input type="checkbox" [(ngModel)]="adminRequest" name="adminRequest" />
+          <span class="ml-2 text-sm text-gray-700 dark:text-gray-200">Solicitar rol de administrador (no activo aún)</span>
+        </label>
+      </div>
+
+      <button type="submit" [disabled]="f.invalid || loading"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition flex items-center justify-center">
+        <span *ngIf="!loading">Registrar</span>
+        <span *ngIf="loading" class="animate-pulse">Registrando…</span>
+      </button>
+
+      <p class="text-center mt-4 text-sm text-gray-500 dark:text-gray-300">
+        ¿Ya tienes cuenta?
+        <button type="button" (click)="switchToLogin()" class="text-blue-600 hover:underline">Iniciar sesión</button>
+      </p>
+    </form>
+  </div>
+</div>

@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
 import { Router, RouterModule } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, take } from 'rxjs';
 import { CarritoResponse, CarritoService, DetalleCarrito } from '../../../service/carrito';
 import { Navbar } from "../layout/navbar/navbar";
 import { Footer } from "../layout/footer/footer";
@@ -13,14 +13,15 @@ import { Footer } from "../layout/footer/footer";
   templateUrl: './cart.html',
   styleUrls: ['./cart.css']
 })
-export class Cart implements OnInit{
-   carrito$!: Observable<CarritoResponse | null>;
+export class Cart implements OnInit {
+  carrito$!: Observable<CarritoResponse | null>;
+
   constructor(
     private carritoService: CarritoService,
     private router: Router
   ) {}
+
   ngOnInit(): void {
-    // ahora sí, carritoService ya está inyectado
     this.carrito$ = this.carritoService.carrito$;
   }
 
@@ -39,8 +40,19 @@ export class Cart implements OnInit{
   }
 
   irAPagar() {
-    // navega a tu ruta de checkout cuando la tengas
-    this.router.navigate(['/checkout']);
+    // Suscribimos una vez para obtener el carrito actual
+    this.carrito$.pipe(take(1)).subscribe(cart => {
+      if (!cart || !cart.detalles?.length) {
+        alert('Tu carrito está vacío.');
+        return;
+      }
+
+      // Guardamos temporalmente el carrito para la siguiente vista
+      this.carritoService.setCarritoTemporal(cart);
+
+      // Redirigimos al checkout
+      this.router.navigate(['/checkout']);
+    });
   }
 
   total(cart: CarritoResponse | null): number {

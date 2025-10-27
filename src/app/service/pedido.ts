@@ -1,27 +1,26 @@
-// pedido.service.ts
-import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, map } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { map, Observable } from 'rxjs';
 
-// pedido.types.ts
+// ==== Tipos ====
 export interface DetallePedidoDTO {
   id: number;
   idProducto: number;
   nombreProducto: string;
   precioUnitario: number;
   cantidad: number;
-  talla: string | null;
-  color: string | null;
+  tallas: string[];
+  colores: string[];
   totalLinea: number;
 }
 
 export interface PedidoDTO {
   id: number;
   idUsuario: number;
-  fechaCreacion: string; // ISO
-  estado: 'CREATED' | 'CONFIRMED' | 'CANCELLED' | string;
+  fechaCreacion: string;
+  estado: 'PENDING' | 'CREATED' | 'CONFIRMED' | 'CANCELLED' | string;
   subtotal: number;
-  impuesto: number;   // IGV
+  impuesto: number;
   envio: number | null;
   descuento: number | null;
   total: number;
@@ -30,18 +29,18 @@ export interface PedidoDTO {
   detalles: DetallePedidoDTO[];
 }
 
-// adapters.ts
 export interface DetalleCarritoView {
   id: number;
   idProducto: number;
   nombreProducto: string;
-  precio: number;        // ← adaptado de precioUnitario
+  precio: number;
   cantidad: number;
-  talla?: string | null;
-  color?: string | null;
-  subtotal: number;      // ← totalLinea
+  tallas: string[];
+  colores: string[];
+  subtotal: number;
 }
 
+// ==== Adaptador ====
 export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
   p.detalles.map(d => ({
     id: d.id,
@@ -49,24 +48,34 @@ export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
     nombreProducto: d.nombreProducto,
     precio: d.precioUnitario,
     cantidad: d.cantidad,
-    talla: d.talla,
-    color: d.color,
+    tallas: d.tallas,
+    colores: d.colores,
     subtotal: d.totalLinea,
   }));
 
 @Injectable({ providedIn: 'root' })
 export class PedidoService {
-  private baseUrl = 'http://localhost:8183/api/pedidos'; // ajusta tu gateway
+  private baseUrl = 'http://localhost:8183/api/pedidos'; // Ajusta si usas gateway
 
   constructor(private http: HttpClient) {}
 
-  crearPedido(input: { idUsuario: number; direccionEnvio: string; metodoPago: string; }): 
-    Observable<{ pedido: PedidoDTO; detallesView: DetalleCarritoView[] }> {
-    return this.http.post<PedidoDTO>(`${this.baseUrl}`, input).pipe(
-      map(pedido => ({
-        pedido,
-        detallesView: mapPedidoToCarritoView(pedido),
-      }))
-    );
+  crearPedido(input: { direccionEnvio: string; metodoPago: string }, token: string):
+  Observable<{ pedido: PedidoDTO; detallesView: DetalleCarritoView[] }> {
+  return this.http.post<PedidoDTO>(this.baseUrl, input, {
+    headers: { Authorization: `Bearer ${token}` }
+  }).pipe(
+    map(pedido => ({
+      pedido,
+      detallesView: mapPedidoToCarritoView(pedido),
+    }))
+  );
+}
+
+  getEstadosPedido(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/estado-pedido`);
+  }
+
+  getMetodosPago(): Observable<string[]> {
+    return this.http.get<string[]>(`${this.baseUrl}/metodo-pago`);
   }
 }

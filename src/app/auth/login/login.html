@@ -1,76 +1,41 @@
-<!-- Fondo oscuro (overlay) -->
-<div
-  *ngIf="isOpen"
-  class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
->
-  <!-- Contenedor del modal -->
-  <div
-    class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-96 p-6 relative animate-fadeIn"
-  >
-    <!-- Botón de cerrar -->
-    <button
-      (click)="close()"
-      class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
-    >
-      ✕
-    </button>
+<div *ngIf="isOpen"
+     class="fixed inset-0 bg-black/50 flex items-center justify-center z-50"
+     role="dialog" aria-modal="true" aria-labelledby="login-title"
+     (click)="close()">
+  <div class="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl w-96 p-6 relative animate-fadeIn"
+       (click)="$event.stopPropagation()">
+    <button (click)="close()" class="absolute top-3 right-3 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200" aria-label="Cerrar modal">✕</button>
 
-    <!-- Título -->
-    <h2 class="text-2xl font-bold text-center mb-5 text-gray-800 dark:text-gray-100">
-      Iniciar Sesión
-    </h2>
+    <h2 id="login-title" class="text-2xl font-bold text-center mb-5 text-gray-800 dark:text-gray-100">Iniciar Sesión</h2>
 
-    <!-- Formulario -->
-    <form #loginForm="ngForm" (ngSubmit)="login()">
+    <form #loginForm="ngForm" (ngSubmit)="login(loginForm)">
       <div class="mb-4">
-        <label
-          for="username"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-200"
-          >Usuario</label
-        >
-        <input
-          type="text"
-          id="username"
-          name="username"
-          [(ngModel)]="username"
-          required
-          class="mt-1 w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Usuario</label>
+        <input id="username" name="username" [(ngModel)]="username" required
+               autocomplete="username" inputmode="email"
+               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"
+               autofocus />
+        <small *ngIf="loginForm.submitted && !username" class="text-red-600">Usuario requerido</small>
       </div>
 
       <div class="mb-4">
-        <label
-          for="password"
-          class="block text-sm font-medium text-gray-700 dark:text-gray-200"
-          >Contraseña</label
-        >
-        <input
-          type="password"
-          id="password"
-          name="password"
-          [(ngModel)]="password"
-          required
-          class="mt-1 w-full px-3 py-2 border rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        />
+        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Contraseña</label>
+        <input id="password" name="password" type="password" [(ngModel)]="password" required minlength="6"
+               autocomplete="current-password"
+               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500"/>
+        <small *ngIf="loginForm.submitted && (!password || password.length<6)" class="text-red-600">Mínimo 6 caracteres</small>
       </div>
 
-      <button
-        type="submit"
-        [disabled]="loginForm.invalid"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition"
-      >
-        Ingresar
+      <button type="submit" [disabled]="loginForm.invalid || loading"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-lg transition flex items-center justify-center">
+        <span *ngIf="!loading">Ingresar</span>
+        <span *ngIf="loading" class="animate-pulse">Ingresando…</span>
       </button>
     </form>
 
     <p class="text-center mt-4 text-sm text-gray-500 dark:text-gray-300">
       ¿No tienes cuenta?
-      <a
-        routerLink="/register"
-        (click)="close()"
-        class="text-blue-600 hover:underline"
-        >Crear cuenta</a
-      >
+      <button type="button" (click)="switchToRegister($event)" class="text-blue-600 hover:underline">Crear cuenta</button>
     </p>
   </div>
 </div>
