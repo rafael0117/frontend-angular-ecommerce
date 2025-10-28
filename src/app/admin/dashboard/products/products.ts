@@ -1,3 +1,4 @@
+// src/app/pages/products/products.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
@@ -13,18 +14,18 @@ import { Categoria } from '../../../interface/categoria';
   templateUrl: './products.html'
 })
 export class Products implements OnInit {
-  // tabla
+  // Tabla
   products: Producto[] = [];
 
-  // categorías
+  // Categorías
   categories: Categoria[] = [];
   categoriesMap: Record<string | number, string> = {};
 
-  // modal
+  // Modal
   showModal = false;
   isEdit = false;
 
-  // formulario
+  // Formulario
   form: Producto = {
     id: 0,
     nombre: '',
@@ -33,12 +34,19 @@ export class Products implements OnInit {
     stock: 0,
     categoriaId: 0,
     categoriaNombre: '',
+    categoriaSexo: '' as any,  // será 'HOMBRE' | 'MUJER'
     talla: [],
     color: [],
     imagenesBase64: []
   };
 
-  // helpers UI
+  // Helpers UI
+  availableSexos: Array<'HOMBRE' | 'MUJER'> = ['HOMBRE', 'MUJER'];
+  availableSubcategorias = [
+    'CAMISA', 'POLO', 'PANTALON', 'JEAN', 'SHORT',
+    'FALDA', 'VESTIDO', 'CHOMPA', 'CASACA', 'ZAPATO', 'ZAPATILLA', 'ACCESORIO'
+  ];
+
   availableSizes = ['XS', 'S', 'M', 'L', 'XL', 'XXL'];
   availableColors = [
     { name: 'Negro', value: '#000000' },
@@ -51,7 +59,7 @@ export class Products implements OnInit {
     { name: 'Rosa', value: '#EC4899' }
   ];
 
-  // previews locales
+  // Previews locales
   previews: string[] = [];
 
   constructor(
@@ -65,9 +73,7 @@ export class Products implements OnInit {
     this.categoriaService.getCategorias().subscribe({
       next: cats => {
         this.categories = cats ?? [];
-        this.categoriesMap = Object.fromEntries(
-          (cats ?? []).map(c => [c.id, c.nombre])
-        );
+        this.categoriesMap = Object.fromEntries((cats ?? []).map(c => [c.id, c.nombre]));
       },
       error: e => console.error('Error cargando categorías', e)
     });
@@ -82,22 +88,29 @@ export class Products implements OnInit {
 
   // --------- Guardar ----------
   save(f: NgForm): void {
-    if (f.invalid || !this.form.precio || this.form.precio <= 0 || !this.form.categoriaId || this.form.talla.length === 0) {
-      alert('Completa nombre, precio (>0), categoría y al menos una talla.');
+    const precioOk = this.form.precio && this.form.precio > 0;
+    const categoriaOk = !!this.form.categoriaId;
+    const sexoOk = this.form.categoriaSexo === 'HOMBRE' || this.form.categoriaSexo === 'MUJER';
+    const tallaOk = this.form.talla.length > 0;
+
+    if (f.invalid || !precioOk || !categoriaOk || !sexoOk || !tallaOk) {
+      alert('Completa: Nombre, Precio (>0), Categoría, Sexo y al menos una Talla.');
       return;
     }
 
-    // (opcional) setear nombre categoría para mostrar en tabla local sin esperar respuesta
+    // setear nombre de categoría para la tabla local
     const cat = this.categories.find(c => ('' + c.id) === ('' + this.form.categoriaId));
     this.form.categoriaNombre = cat?.nombre || '';
 
+    // Payload limpio (sin id)
     const payload: Omit<Producto, 'id'> = {
-      nombre: this.form.nombre,
-      descripcion: this.form.descripcion || '',
+      nombre: this.form.nombre.trim(),
+      descripcion: (this.form.descripcion || '').trim(),
       precio: Number(this.form.precio),
       stock: Number(this.form.stock || 0),
       categoriaId: Number(this.form.categoriaId),
-      categoriaNombre: this.form.categoriaNombre, // el back puede ignorarlo
+      categoriaNombre: this.form.categoriaNombre,
+      categoriaSexo: this.form.categoriaSexo,
       talla: [...(this.form.talla || [])],
       color: [...(this.form.color || [])],
       imagenesBase64: [...(this.form.imagenesBase64 || [])]
@@ -108,7 +121,10 @@ export class Products implements OnInit {
       : this.productoService.addProducto(payload);
 
     obs.subscribe({
-      next: () => { this.closeModal(); this.loadProducts(); },
+      next: () => {
+        this.closeModal();
+        this.loadProducts();
+      },
       error: e => console.error('Error guardando', e)
     });
   }
@@ -133,6 +149,7 @@ export class Products implements OnInit {
       stock: 0,
       categoriaId: 0,
       categoriaNombre: '',
+      categoriaSexo: '' as any,
       talla: [],
       color: [],
       imagenesBase64: []
@@ -146,11 +163,12 @@ export class Products implements OnInit {
     this.form = {
       ...p,
       categoriaId: Number(p.categoriaId),
+      categoriaSexo: p.categoriaSexo as any,
       talla: [...(p.talla || [])],
       color: [...(p.color || [])],
       imagenesBase64: [...(p.imagenesBase64 || [])]
     };
-    this.previews = [...(this.form.imagenesBase64 || [])]; // mostrar lo que viene del back
+    this.previews = [...(this.form.imagenesBase64 || [])];
     this.showModal = true;
   }
 
@@ -184,7 +202,7 @@ export class Products implements OnInit {
       reader.readAsDataURL(file);
     });
 
-    // permite volver a seleccionar las mismas imágenes
+    // Permite volver a seleccionar las mismas imágenes
     evt.target.value = '';
   }
 
@@ -192,4 +210,7 @@ export class Products implements OnInit {
     this.form.imagenesBase64.splice(i, 1);
     this.previews.splice(i, 1);
   }
+
+  // --------- TrackBy para tabla ----------
+  trackByProductId = (_: number, p: Producto) => p.id;
 }
