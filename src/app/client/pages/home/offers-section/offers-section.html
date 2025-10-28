@@ -1,31 +1,79 @@
-<section class="py-16 px-4 sm:px-6 lg:px-8 bg-secondary">
-  <div class="max-w-7xl mx-auto">
-    <div class="text-center mb-12">
-      <span class="badge mb-4 bg-accent text-accent-foreground">Ofertas Especiales</span>
-      <h2 class="font-bold text-4xl sm:text-5xl mb-4">Descuentos Exclusivos</h2>
-      <p class="text-lg text-muted-foreground max-w-2xl mx-auto">
-        Aprovecha nuestras ofertas por tiempo limitado
-      </p>
-    </div>
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-      <ng-container *ngFor="">
-        <div class="group overflow-hidden border hover:shadow-xl transition-shadow bg-card">
-          <div class="p-0">
-            <div class="relative overflow-hidden aspect-[3/4]">
-              <img [src]="" [alt]="" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" />
-              <span class="badge absolute top-4 right-4 bg-accent text-base px-3 py-1"></span>
-            </div>
-            <div class="p-6">
-              <h3 class="text-xl font-semibold mb-3"></h3>
-              <div class="flex items-center gap-3 mb-4">
-                <span class="text-2xl font-bold"></span>
-                <span class="text-lg text-muted-foreground line-through"></span>
-              </div>
-              <button class="btn btn-primary w-full">Comprar Ahora</button>
-            </div>
-          </div>
-        </div>
-      </ng-container>
-    </div>
+<section class="py-16 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto">
+  <div class="text-center mb-14">
+    <h2 class="font-bold text-4xl sm:text-5xl mb-3 text-slate-800 tracking-tight">
+      Colección para Mujeres
+    </h2>
+    <p class="text-lg text-slate-500 max-w-2xl mx-auto leading-relaxed">
+      Estilo, elegancia y comodidad para cada momento
+    </p>
   </div>
+
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+    <ng-container *ngFor="let producto of productos">
+      <div
+        class="group bg-white rounded-2xl overflow-hidden border border-slate-200 hover:border-slate-300 hover:shadow-lg transition-all duration-300"
+      >
+        <div class="relative aspect-[3/4] overflow-hidden">
+          <ng-container *ngIf="producto.imagenesBase64?.length; else sinImg">
+            <img
+              [src]="getImagen(producto)"
+              [alt]="producto.nombre"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
+              (error)="onImgError($event)"
+            />
+            <div
+              class="absolute left-2 bottom-2 flex gap-1 bg-white/70 backdrop-blur-sm p-1 rounded-md shadow-sm"
+            >
+              <img
+                *ngFor="let thumb of producto.imagenesBase64; let i = index"
+                [src]="thumb"
+                class="w-10 h-10 object-cover border border-slate-300 rounded cursor-pointer hover:opacity-80 transition"
+                (click)="cambiarImagen(producto, i)"
+                (error)="onImgError($event)"
+              />
+            </div>
+          </ng-container>
+          <ng-template #sinImg>
+            <img
+              src="assets/images/placeholder.jpg"
+              class="w-full h-full object-cover opacity-80"
+            />
+          </ng-template>
+        </div>
+
+        <div class="p-5 flex flex-col">
+          <p class="text-xs uppercase text-rose-400 tracking-wide mb-1">
+            {{ producto.categoriaNombre }}
+          </p>
+          <h3 class="text-lg font-semibold text-slate-800 mb-3">
+            {{ producto.nombre }}
+          </h3>
+
+          <div class="flex items-center justify-between mb-4">
+            <span class="text-xl font-semibold text-slate-800">
+              {{ producto.precio | currency:'PEN' }}
+            </span>
+          </div>
+
+          <!-- Botón Ver más -->
+          <button
+            class="w-full py-2 rounded-lg bg-rose-100 hover:bg-rose-200 text-rose-700 font-medium text-sm transition-all duration-200"
+            (click)="verMas(producto)"
+          >
+            Ver más
+          </button>
+        </div>
+      </div>
+    </ng-container>
+  </div>
+
+  <div class="text-center mt-14">
+    <button
+      class="px-6 py-3 border border-slate-300 rounded-lg text-slate-700 hover:bg-slate-800 hover:text-white transition-all duration-300 font-semibold"
+    >
+      Ver Toda la Colección
+    </button>
+  </div>
+
+  <app-login *ngIf="showLoginModal" (close)="showLoginModal = false"></app-login>
 </section>

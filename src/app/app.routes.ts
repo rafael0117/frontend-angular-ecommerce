@@ -20,6 +20,7 @@ import { ProductsForm } from './admin/dashboard/products-form/products-form';
 import { Categories } from './admin/dashboard/categories/categories';
 import { CategoriesForm } from './admin/dashboard/categories-form/categories-form';
 import { PublicLayout } from './client/pages/public-layout/public-layout';
+import { ProductDetail } from './client/pages/home/product-detail/product-detail';
 
 export const routes: Routes = [
   // ====== LAYOUT PÚBLICO (Navbar + Footer) ======
@@ -28,6 +29,7 @@ export const routes: Routes = [
     component: PublicLayout,
     children: [
       { path: '', component: HomePage },
+      { path: 'product-detail/:id', component: ProductDetail },
       { path: 'carrito', component: Cart },
       { path: 'checkout', component: Pedido },
       { path: 'auth', component: AuthShellComponent }, // si quieres mantener el shell por URL

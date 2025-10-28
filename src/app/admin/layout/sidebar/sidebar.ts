@@ -1,13 +1,15 @@
 import { Component, HostBinding, OnInit } from '@angular/core';
+import { Router } from '@angular/router';
 import { RouterLink, RouterLinkActive } from '@angular/router';
-import { NgFor, NgClass } from '@angular/common';
+import { NgFor, NgClass, CommonModule } from '@angular/common';
+import { AuthService } from '../../../service/auth'; // ajusta la ruta si difiere
 
 type MenuItem = { icon: string; label: string; path: string; exact?: boolean };
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive, NgFor, NgClass],
+  imports: [CommonModule, RouterLink, RouterLinkActive, NgFor, NgClass],
   templateUrl: './sidebar.html'
 })
 export class Sidebar implements OnInit {
@@ -18,12 +20,14 @@ export class Sidebar implements OnInit {
   collapsed = false;
   brand = 'Fashion Store';
 
-  // RUTAS RELATIVAS (sin slash)
+  // Rutas RELATIVAS al /admin (porque Sidebar vive bajo AdminLayout)
   menu: MenuItem[] = [
     { icon: '📊', label: 'Dashboard',  path: 'dashboard',  exact: true },
     { icon: '📦', label: 'Productos',  path: 'products' },
     { icon: '🏷️', label: 'Categorías', path: 'categories' }
   ];
+
+  constructor(private auth: AuthService, private router: Router) {}
 
   ngOnInit(): void {
     const saved = localStorage.getItem('sidebar:collapsed');
@@ -33,5 +37,13 @@ export class Sidebar implements OnInit {
   toggle(): void {
     this.collapsed = !this.collapsed;
     localStorage.setItem('sidebar:collapsed', this.collapsed ? '1' : '0');
+  }
+
+  // 👉 Logout + navegar a la home pública
+  logout(): void {
+    this.auth.logoutAllServerSide().subscribe({
+      next: () => this.router.navigate(['/']),
+      error: () => this.router.navigate(['/']) // por si el server falla, igual salimos
+    });
   }
 }

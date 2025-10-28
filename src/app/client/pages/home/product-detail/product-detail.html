@@ -1,0 +1,99 @@
+<section class="max-w-7xl mx-auto px-6 py-16 grid md:grid-cols-2 gap-14 items-start">
+  <!-- Imagen principal -->
+  <div class="flex flex-col items-center">
+    <img
+      [src]="getImagenPrincipal()"
+      [alt]="producto?.nombre"
+      class="w-full h-[600px] object-contain rounded-xl bg-white"
+    />
+
+    <!-- miniaturas -->
+    <div class="flex gap-2 mt-4 flex-wrap justify-center">
+      <img
+        *ngFor="let img of producto?.imagenesBase64"
+        [src]="img"
+        class="w-24 h-24 border border-gray-300 rounded-lg object-cover cursor-pointer hover:opacity-80"
+        (click)="setImagenPrincipal(img)"
+      />
+    </div>
+  </div>
+
+  <!-- Detalle del producto -->
+  <div>
+    <h1 class="text-2xl md:text-3xl font-semibold mb-3 uppercase">{{ producto?.nombre }}</h1>
+    <p class="text-lg text-gray-700 mb-6">{{ producto?.precio | currency:'PEN' }}</p>
+
+    <!-- Colores -->
+    <div *ngIf="producto?.color?.length" class="mb-8">
+      <p class="font-semibold text-gray-700 mb-2">Color:</p>
+      <div class="flex gap-3">
+        <button
+          *ngFor="let c of producto?.color"
+          type="button"
+          class="w-12 h-12 rounded-md border border-gray-300 transition relative"
+          [ngStyle]="{ 'background-color': cssColor(c) }"
+          [class.ring-2]="selectedColor === c"
+          [class.ring-gray-900]="selectedColor === c"
+          (click)="selectedColor = c"
+          title="{{ c }}"
+        >
+          <span
+            *ngIf="selectedColor === c"
+            class="absolute inset-0 rounded-md ring-2 ring-offset-2 ring-gray-900"
+          ></span>
+        </button>
+      </div>
+      <p *ngIf="selectedColor" class="text-sm mt-2 text-gray-600">
+        Seleccionado: {{ humanColor(selectedColor) }}
+      </p>
+    </div>
+
+    <!-- Tallas -->
+    <div *ngIf="producto?.talla?.length" class="mb-8">
+      <p class="font-semibold text-gray-700 mb-2">Talla:</p>
+      <div class="grid grid-cols-5 gap-2">
+        <button
+          *ngFor="let t of producto?.talla"
+          type="button"
+          class="border py-2 rounded-md font-medium transition hover:bg-gray-100"
+          [class.bg-black]="selectedSize === t"
+          [class.text-white]="selectedSize === t"
+          (click)="selectedSize = t"
+        >
+          {{ t }}
+        </button>
+      </div>
+      <a href="#" class="block mt-3 text-sm text-blue-700 hover:underline">
+        Guía de tallas
+      </a>
+    </div>
+
+    <!-- Botón Añadir -->
+    <button
+      class="w-full py-3 bg-black text-white uppercase font-semibold tracking-wide hover:bg-gray-900 transition rounded-md"
+      [disabled]="loading"
+      (click)="agregarAlCarrito()"
+    >
+      <ng-container *ngIf="!loading; else loadingTpl">Añadir</ng-container>
+      <ng-template #loadingTpl>Agregando...</ng-template>
+    </button>
+
+    <!-- Información adicional -->
+    <div class="mt-8 border-t border-gray-200 pt-4 space-y-2 text-sm text-gray-600">
+      <details>
+        <summary class="cursor-pointer font-semibold">Descripción</summary>
+        <p class="mt-2">{{ producto?.descripcion || 'Sin descripción disponible.' }}</p>
+      </details>
+
+      <details>
+        <summary class="cursor-pointer font-semibold">Materiales</summary>
+        <p class="mt-2">Algodón, Poliéster, Lino (según tipo).</p>
+      </details>
+
+      <details>
+        <summary class="cursor-pointer font-semibold">Guía de cuidados</summary>
+        <p class="mt-2">Lavar a máquina a 30°C, no usar blanqueador.</p>
+      </details>
+    </div>
+  </div>
+</section>
