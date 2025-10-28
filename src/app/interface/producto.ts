@@ -4,9 +4,10 @@ export interface Producto {
   descripcion: string;
   precio: number;
   stock: number;
-
+  categoriaSexo: string,
   categoriaId: number;
   categoriaNombre?: string;   // opcional (si el back lo envía)
+  
 
   talla: string[];            // arrays
   color: string[];            // arrays
