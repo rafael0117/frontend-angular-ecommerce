@@ -29,19 +29,25 @@ export class ProductsSection implements OnInit {
     private toastr: ToastrService
   ) {}
 
-  ngOnInit() {
-    this.productoService.getProductos().subscribe({
-      next: (data) => {
-        this.productos = (data || []).map(p => ({
-          ...p,
-          imagenesBase64: (p.imagenesBase64 || []).map(img =>
-            img?.startsWith('data:image/') ? img : `data:image/jpeg;base64,${img}`
-          )
-        }));
-      },
-      error: () => this.toastr.error('No se pudo cargar los productos')
-    });
-  }
+ngOnInit() {
+  this.productoService.getProductos().subscribe({
+    next: (data) => {
+      const all = (data || []).map(p => ({
+        ...p,
+        imagenesBase64: (p.imagenesBase64 || []).map(img =>
+          img?.startsWith('data:image/') ? img : `data:image/jpeg;base64,${img}`
+        )
+      }));
+
+      // 🔹 Solo HOMBRES (robusto a mayúsculas/minúsculas y nulos)
+      this.productos = all.filter(p =>
+        (p as any)?.categoriaSexo?.toString().toUpperCase() === 'HOMBRE'
+      );
+    },
+    error: () => this.toastr.error('No se pudo cargar los productos')
+  });
+}
+
 
   // Imagen principal
   getImagen(prod: Producto): string {
@@ -59,19 +65,9 @@ export class ProductsSection implements OnInit {
   onImgError(ev: Event) {
     (ev.target as HTMLImageElement).src = 'assets/images/placeholder.jpg';
   }
-
-  agregar(producto: Producto) {
-    if (!this.auth.isAuthenticated()) {
-      this.toastr.info('Inicia sesión para agregar al carrito');
-      this.showLoginModal = true; // abrir modal de login
-      return;
-    }
-
-    this.loadingId = producto.id;
-    this.carrito.agregar({ idProducto: producto.id, cantidad: 1 }).subscribe({
-      next: () => this.toastr.success('Producto agregado al carrito'),
-      error: () => this.toastr.error('No se pudo agregar al carrito'),
-      complete: () => (this.loadingId = null)
-    });
+  verMas(producto: Producto) {
+    this.router.navigate(['/product-detail', producto.id]);
   }
+
+
 }
