@@ -10,8 +10,8 @@ export interface DetallePedidoDTO {
   nombreProducto: string;
   precioUnitario: number;
   cantidad: number;
-  tallas: string[];
-  colores: string[];
+  talla: string;   // ✅ ahora string
+  color: string;  // ✅ ahora string
   totalLinea: number;
 }
 
@@ -37,16 +37,19 @@ export interface DetalleCarritoView {
   nombreProducto: string;
   precio: number;
   cantidad: number;
-  tallas: string[];
-  colores: string[];
+  talla: string;   // ✅ string
+  color: string;  // ✅ string
   subtotal: number;
 }
+
 export interface PedidoAdminUpdateRequest {
   estado: string;
-  envio?: number | null;       // ✅ permite null o undefined
-  descuento?: number | null;   // ✅ permite null o undefined
+  envio?: number | null;       // permite null o undefined
+  descuento?: number | null;   // permite null o undefined
   mensaje?: string;  
 }
+
+// Mapper de Pedido a DetalleCarritoView
 export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
   p.detalles.map(d => ({
     id: d.id,
@@ -54,8 +57,8 @@ export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
     nombreProducto: d.nombreProducto,
     precio: d.precioUnitario,
     cantidad: d.cantidad,
-    tallas: d.tallas,
-    colores: d.colores,
+    talla: d.talla,
+    color: d.color,
     subtotal: d.totalLinea,
   }));
 
@@ -65,25 +68,27 @@ export class PedidoService {
 
   constructor(private http: HttpClient) {}
 
+  // Crear pedido
   crearPedido(input: { direccionEnvio: string; metodoPago: string }, token: string):
   Observable<{ pedido: PedidoDTO; detallesView: DetalleCarritoView[] }> {
-  return this.http.post<PedidoDTO>(this.baseUrl, input, {
-    headers: { Authorization: `Bearer ${token}` }
-  }).pipe(
-    map(pedido => ({
-      pedido,
-      detallesView: mapPedidoToCarritoView(pedido),
-    }))
-  );
-}
- // 🔹 Listar todos los pedidos (solo para admins)
+    return this.http.post<PedidoDTO>(this.baseUrl, input, {
+      headers: { Authorization: `Bearer ${token}` }
+    }).pipe(
+      map(pedido => ({
+        pedido,
+        detallesView: mapPedidoToCarritoView(pedido),
+      }))
+    );
+  }
+
+  // Listar todos los pedidos (solo admins)
   listarPedidos(token: string): Observable<PedidoDTO[]> {
     return this.http.get<PedidoDTO[]>(this.baseUrl, {
       headers: { Authorization: `Bearer ${token}` }
     });
   }
 
-  // 🔹 Actualizar pedido como admin
+  // Actualizar pedido como admin
   actualizarPedidoComoAdmin(id: number, data: PedidoAdminUpdateRequest, token: string):
     Observable<PedidoDTO> {
     return this.http.put<PedidoDTO>(`${this.baseUrl}/${id}/admin`, data, {
@@ -91,10 +96,12 @@ export class PedidoService {
     });
   }
 
+  // Obtener estados de pedido
   getEstadosPedido(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/estado-pedido`);
   }
 
+  // Obtener métodos de pago
   getMetodosPago(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/metodo-pago`);
   }
