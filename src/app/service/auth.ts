@@ -4,9 +4,10 @@ import { BehaviorSubject, Observable, tap } from 'rxjs';
 import { Registrar } from '../interface/registrar';
 import { TokenPairResponse } from '../interface/token-pair-response';
 import { Login } from '../interface/login';
+import { environment } from '../../enviroments/environment';
 
 // ==== Constantes a nivel de módulo ====
-const API_URL = 'http://localhost:9000/api/auth';
+const API_URL = `${environment.apiBaseUrl}/api/auth`;;
 
 // Usa sessionStorage (recomendado para access token)
 const SS = sessionStorage;

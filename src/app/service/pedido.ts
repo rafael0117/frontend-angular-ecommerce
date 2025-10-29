@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, Observable } from 'rxjs';
+import { environment } from '../../enviroments/environment';
 
 // ==== Tipos ====
 export interface DetallePedidoDTO {
@@ -26,6 +27,7 @@ export interface PedidoDTO {
   total: number;
   direccionEnvio: string;
   metodoPago: string;
+  mensaje?: string; 
   detalles: DetallePedidoDTO[];
 }
 
@@ -39,8 +41,12 @@ export interface DetalleCarritoView {
   colores: string[];
   subtotal: number;
 }
-
-// ==== Adaptador ====
+export interface PedidoAdminUpdateRequest {
+  estado: string;
+  envio?: number | null;       // ✅ permite null o undefined
+  descuento?: number | null;   // ✅ permite null o undefined
+  mensaje?: string;  
+}
 export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
   p.detalles.map(d => ({
     id: d.id,
@@ -55,7 +61,7 @@ export const mapPedidoToCarritoView = (p: PedidoDTO): DetalleCarritoView[] =>
 
 @Injectable({ providedIn: 'root' })
 export class PedidoService {
-  private baseUrl = 'http://localhost:8183/api/pedidos'; // Ajusta si usas gateway
+  private baseUrl = `${environment.apiBaseUrl}/api/pedidos`; // Ajusta si usas gateway
 
   constructor(private http: HttpClient) {}
 
@@ -70,6 +76,20 @@ export class PedidoService {
     }))
   );
 }
+ // 🔹 Listar todos los pedidos (solo para admins)
+  listarPedidos(token: string): Observable<PedidoDTO[]> {
+    return this.http.get<PedidoDTO[]>(this.baseUrl, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
+
+  // 🔹 Actualizar pedido como admin
+  actualizarPedidoComoAdmin(id: number, data: PedidoAdminUpdateRequest, token: string):
+    Observable<PedidoDTO> {
+    return this.http.put<PedidoDTO>(`${this.baseUrl}/${id}/admin`, data, {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+  }
 
   getEstadosPedido(): Observable<string[]> {
     return this.http.get<string[]>(`${this.baseUrl}/estado-pedido`);
