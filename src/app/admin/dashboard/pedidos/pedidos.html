@@ -1,0 +1,47 @@
+<div class="p-6">
+  <h2 class="text-2xl font-semibold mb-4">Listado de Pedidos</h2>
+
+  <div *ngIf="loading" class="text-gray-500">Cargando pedidos...</div>
+  <div *ngIf="errorMessage" class="text-red-600">{{ errorMessage }}</div>
+
+  <table *ngIf="!loading && pedidos.length > 0" class="min-w-full border">
+    <thead>
+      <tr class="bg-gray-100">
+        <th class="border p-2">ID</th>
+        <th class="border p-2">Usuario</th>
+        <th class="border p-2">Fecha</th>
+        <th class="border p-2">Estado</th>
+        <th class="border p-2">Total</th>
+        <th class="border p-2">Método de Pago</th>
+        <th class="border p-2">Acciones</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let pedido of pedidos" class="hover:bg-gray-50">
+        <td class="border p-2 text-center">{{ pedido.id }}</td>
+        <td class="border p-2 text-center">{{ pedido.idUsuario }}</td>
+        <td class="border p-2 text-center">{{ pedido.fechaCreacion | date: 'short' }}</td>
+        <td class="border p-2 text-center font-medium">{{ pedido.estado }}</td>
+        <td class="border p-2 text-center font-semibold">S/. {{ pedido.total | number: '1.2-2' }}</td>
+        <td class="border p-2 text-center font-medium">{{ pedido.metodoPago }}</td>
+        <td class="border p-2 text-center">
+          <button class="bg-blue-600 hover:bg-blue-700 text-white px-3 py-1 rounded"
+                  (click)="abrirModal(pedido)">
+            Ver
+          </button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && pedidos.length === 0" class="text-gray-500 mt-4">
+    No hay pedidos registrados.
+  </div>
+
+  <!-- Modal -->
+  <app-pedidos-form *ngIf="pedidoSeleccionado"
+                    [pedido]="pedidoSeleccionado"
+                    (cerrado)="cerrarModal()"
+                    (actualizado)="onPedidoActualizado($event)">
+  </app-pedidos-form>
+</div>

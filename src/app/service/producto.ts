@@ -2,10 +2,11 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Producto } from '../interface/producto';
 import { Observable } from 'rxjs';
+import { environment } from '../../enviroments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class ProductoService {
-  private API = 'http://localhost:8181/api'; // ajusta puerto si aplica
+  private API = `${environment.apiBaseUrl}/api`; // ajusta puerto si aplica
 
   constructor(private http: HttpClient) {}
 

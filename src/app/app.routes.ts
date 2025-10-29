@@ -21,6 +21,7 @@ import { Categories } from './admin/dashboard/categories/categories';
 import { CategoriesForm } from './admin/dashboard/categories-form/categories-form';
 import { PublicLayout } from './client/pages/public-layout/public-layout';
 import { ProductDetail } from './client/pages/home/product-detail/product-detail';
+import { Pedidos } from './admin/dashboard/pedidos/pedidos';
 
 export const routes: Routes = [
   // ====== LAYOUT PÚBLICO (Navbar + Footer) ======
@@ -50,6 +51,8 @@ export const routes: Routes = [
       { path: 'categories', component: Categories },
       { path: 'categories/new', component: CategoriesForm },
       { path: 'categories/:id/edit', component: CategoriesForm },
+      { path: 'pedidos', component: Pedidos},
+
     ],
   },
 

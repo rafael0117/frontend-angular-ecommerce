@@ -2,6 +2,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
+import { environment } from '../../enviroments/environment';
 
 // src/app/service/carrito.model.ts
 export interface DetalleCarritoDto {
@@ -30,7 +31,7 @@ export interface CarritoResponse {
 
 
 @Injectable({ providedIn: 'root' })
-export class CarritoService {private apiUrl = 'http://localhost:8185/api/carrito';
+export class CarritoService {private apiUrl = `${environment.apiBaseUrl}/api/carrito`;
   private _carrito$ = new BehaviorSubject<CarritoResponse | null>(null);
   carrito$ = this._carrito$.asObservable();
   private _count$ = new BehaviorSubject<number>(0);

@@ -9,14 +9,26 @@
     <h2 id="register-title" class="text-2xl font-bold text-center mb-5 text-gray-800 dark:text-gray-100">Crear cuenta</h2>
 
     <form #f="ngForm" (ngSubmit)="submit(f)">
+      
+      <!-- Email -->
       <div class="mb-4">
-        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Usuario (email o nombre)</label>
+        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Correo electrónico</label>
+        <input id="email" name="email" [(ngModel)]="email" required email
+               autocomplete="email" inputmode="email"
+               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
+        <small *ngIf="f.submitted && !email" class="text-red-600">Correo requerido</small>
+      </div>
+
+      <!-- Usuario -->
+      <div class="mb-4">
+        <label for="username" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Usuario (nombre de usuario)</label>
         <input id="username" name="username" [(ngModel)]="username" required
-               autocomplete="username" inputmode="email"
-               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" autofocus />
+               autocomplete="username"
+               class="mt-1 w-full px-3 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500" />
         <small *ngIf="f.submitted && !username" class="text-red-600">Usuario requerido</small>
       </div>
 
+      <!-- Contraseña -->
       <div class="mb-4">
         <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-200">Contraseña</label>
         <div class="relative">
