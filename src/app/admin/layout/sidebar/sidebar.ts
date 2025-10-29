@@ -24,7 +24,8 @@ export class Sidebar implements OnInit {
   menu: MenuItem[] = [
     { icon: '📊', label: 'Dashboard',  path: 'dashboard',  exact: true },
     { icon: '📦', label: 'Productos',  path: 'products' },
-    { icon: '🏷️', label: 'Categorías', path: 'categories' }
+    { icon: '🏷️', label: 'Categorías', path: 'categories' },
+    { icon: '📝', label: 'Pedidos',    path: 'pedidos' }
   ];
 
   constructor(private auth: AuthService, private router: Router) {}

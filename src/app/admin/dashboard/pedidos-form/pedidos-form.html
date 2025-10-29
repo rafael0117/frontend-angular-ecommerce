@@ -1,0 +1,48 @@
+<div class="fixed inset-0 bg-black/50 flex justify-center items-center z-50">
+  <div class="bg-white rounded-lg p-6 w-96 max-h-[90vh] overflow-auto">
+    <h3 class="text-lg font-semibold mb-4">Detalles del pedido #{{ pedido?.id }}</h3>
+
+    <div *ngIf="pedido">
+      <div class="mb-2">
+        <label class="block font-medium">Estado:</label>
+        <select [(ngModel)]="pedido.estado" class="border p-1 w-full">
+          <option *ngFor="let e of estadosPedido" [value]="e">{{ e }}</option>
+        </select>
+      </div>
+
+      <div class="mb-2">
+        <label class="block font-medium">Envío:</label>
+        <input type="number" [(ngModel)]="pedido.envio" class="border p-1 w-full">
+      </div>
+
+      <div class="mb-2">
+        <label class="block font-medium">Descuento:</label>
+        <input type="number" [(ngModel)]="pedido.descuento" class="border p-1 w-full">
+      </div>
+
+      <div class="mb-2">
+        <label class="block font-medium">Mensaje:</label>
+        <textarea [(ngModel)]="pedido.mensaje" rows="3" class="border p-1 w-full"></textarea>
+      </div>
+
+      <div class="mb-2">
+        <h4 class="font-medium">Detalles de productos:</h4>
+        <ul class="list-disc ml-5">
+          <li *ngFor="let d of pedido.detalles">
+            {{ d.nombreProducto }} x{{ d.cantidad }} - S/. {{ d.totalLinea }}
+          </li>
+        </ul>
+      </div>
+
+      <div *ngIf="mensajeError" class="text-red-600 mb-2">{{ mensajeError }}</div>
+
+      <div class="flex justify-end gap-2 mt-4">
+        <button (click)="cerrar()" class="px-4 py-2 border rounded hover:bg-gray-100">Cerrar</button>
+        <button (click)="guardarCambios()" [disabled]="cargando"
+                class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
