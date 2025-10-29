@@ -18,6 +18,7 @@ export class Register {
   @Output() isOpenChange = new EventEmitter<boolean>();
   @Output() requestLogin = new EventEmitter<void>();
 
+  email = '';
   username = '';
   password = '';
   showPassword = false;
@@ -31,10 +32,8 @@ export class Register {
   private lockScroll(lock: boolean) {
     document.body.style.overflow = lock ? 'hidden' : '';
   }
-  ngOnChanges() { this.lockScroll(this.isOpen); 
-  }
-  ngOnDestroy() { this.lockScroll(false); 
-  }
+  ngOnChanges() { this.lockScroll(this.isOpen); }
+  ngOnDestroy() { this.lockScroll(false); }
 
   close() { this.isOpen = false; this.isOpenChange.emit(false); this.lockScroll(false); }
   togglePassword() { this.showPassword = !this.showPassword; }
@@ -42,16 +41,19 @@ export class Register {
   switchToLogin() {
     this.close();
     this.router.navigate([], { queryParams: { view: 'login' }, queryParamsHandling: 'merge' });
-
     this.requestLogin.emit();
   }
 
   submit(form: NgForm) {
-    if (form.invalid) { this.toast.warning('Completa usuario y contraseña'); return; }
+    if (form.invalid) {
+      this.toast.warning('Completa todos los campos');
+      return;
+    }
     if (this.loading) return;
     this.loading = true;
 
     const payload: Registrar = {
+      email: this.email.trim(),
       username: this.username.trim(),
       password: this.password,
       // adminRequest: this.adminRequest
